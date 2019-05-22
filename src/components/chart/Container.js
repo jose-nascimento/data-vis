@@ -35,7 +35,7 @@ class Container extends Component {
           height='auto'
           style={{maxHeight: '75vh'}}
         >
-          <Histogram data={data} width={320} height={320} count={10} />
+          <Histogram data={data} width={320} height={320} nice />
           {/* <svg x="320" y="320">
             <circle cx="64" cy="64" r="64" fill="#000" />
           </svg> */}

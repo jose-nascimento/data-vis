@@ -49,9 +49,11 @@ function builder({ svg, margin, width, height }) {
             .call(d3.axisBottom(x));
         
         // set the parameters for the histogram
-        var histogram = d3.histogram();
-            // .domain(x.domain())  // then the domain of the graphic
-            // .thresholds(x.ticks(70)); // then the numbers of bins
+        // console.log('ticks', x.ticks(16));
+        
+        var histogram = d3.histogram()
+        .domain(x.domain())  // then the domain of the graphic
+        .thresholds(x.ticks(11)); // then the numbers of bins
 
         console.info(histogram)
         
@@ -59,7 +61,9 @@ function builder({ svg, margin, width, height }) {
         // And apply this function to data to get the bins
         var bins = histogram(data);
         console.log('bins', bins);
-        console.info(bins);
+        // console.info(bins);
+        console.log(x.ticks(bins.length));
+        
         
         // Y axis: scale and draw:
         var y = d3.scaleLinear()
