@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import Chart from '../components/chart/Chart'
+import Container from '../components/chart/Container'
 
 class Index extends Component {
   render() {
     return (
       <main>
         <h1>Data Visualization</h1>
-        <Chart />
+        <Container />
       </main>
     );
   }
