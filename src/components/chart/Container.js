@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
-import PropTypes from "prop-types";
-import Histogram from "../../charts/histogram/Histogram";
+import PropTypes from 'prop-types';
+import Histogram from '../../charts/histogram/Histogram';
+import TimeSeries from '../../charts/timeseries/TimeSeries';
+// import { dsvFormat } from "d3-dsv";
+import { dsv } from "d3-fetch";
+import { mapToDate } from "../../charts/timeseries/helpers";
+// const timeseries = csvLoader('../../../public/timeseries.csv');
 
 const style = {
   color: '#EEE',
@@ -21,24 +26,48 @@ class Container extends Component {
         top: 20, right: 20, bottom: 20, left: 20, },
     group: (props) => <g>{props.children}</g>,
   };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {loaded: false};
+  }
+
+  componentDidMount() {
+    dsv(' ', 'https://gordonlesti.com/media/post/d3-time-series-example/timeseries.csv', d => d).then(data => {
+      const timeseries = mapToDate(data.slice(0, 200), (d) => d.t).map((d, i) => ({t: d, x: data[i].x * 0.01}));
+      
+      this.setState({cdata: data, loaded: true});
+    })
+  }
+
   render() {
     const { width, height, margin, group: Group, ...props } = { ...this.props };
+    // const cdata = dsvFormat(' ').parse(timeseries);
     return (
       <figure style={style}>
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink"
+          xmlns='http://www.w3.org/2000/svg'
+          xmlnsXlink='http://www.w3.org/1999/xlink'
           viewBox={`-${margin.left} -${margin.top} ${width +
-            margin.left + margin.right} ${height + margin.top + margin.bottom}`}
-          preserveAspectRatio="xMinYMin meet"
+            margin.left +
+            margin.right} ${height + margin.top + margin.bottom}`}
+          preserveAspectRatio='xMinYMax meet'
           width='100%'
           height='auto'
-          style={{maxHeight: '75vh'}}
+          style={{ maxHeight: '75vh' }}
         >
           <Histogram data={data} width={320} height={320} nice />
-          {/* <svg x="320" y="320">
-            <circle cx="64" cy="64" r="64" fill="#000" />
-          </svg> */}
+
+          {this.state.loaded ? (
+            <TimeSeries
+              data={this.state.cdata}
+              width={600}
+              height={380}
+              accX={(d) => d.t}
+              accY={(d) => d.x}
+            />
+          ) : null}
         </svg>
       </figure>
     );

@@ -2,8 +2,6 @@ import React from 'react';
 
 export function Bar(props) {
   const { d, scale, height, ...rest } = props;
-  console.log('Bar height', height, height - scale.y(d.length)); 
-  console.log(d.x0, d.x1, d.length);
    
   return (
     <g className='bar'>
@@ -17,7 +15,3 @@ export function Bar(props) {
     </g>
   );
 }
-
-//         fill={fill || ''}
-//         stroke={stroke || ''}
-//         strokeWidth={strokeWidth || ''}
