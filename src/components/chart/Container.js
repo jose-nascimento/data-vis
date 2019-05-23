@@ -34,10 +34,10 @@ class Container extends Component {
   }
 
   componentDidMount() {
-    dsv(' ', 'https://gordonlesti.com/media/post/d3-time-series-example/timeseries.csv', d => d).then(data => {
-      const timeseries = mapToDate(data.slice(0, 200), (d) => d.t).map((d, i) => ({t: d, x: data[i].x * 0.01}));
+    dsv(' ', '/public/timeseries.csv', d => d).then(data => {
+      const timeseries = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: data[i].x}));
       
-      this.setState({cdata: data, loaded: true});
+      this.setState({cdata: timeseries, loaded: true});
     })
   }
 
