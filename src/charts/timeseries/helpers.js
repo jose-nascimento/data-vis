@@ -16,10 +16,8 @@ export function tdf(domain, range = [0.003, 0.03]) {
 
 export function toDateFactory([ start, end ], range = [new Date(70, 0, 1), new Date(2038, 0, 18)]) {
     const ts = scaleTime().domain(range).range([start, end]);
-    console.log('tdf', `ifrom: ${ts.domain()} ito: ${ts.range()}`);
     
     return function(datum) {
-        console.log('tdf', datum, ts.invert(datum));
         
         return ts.invert(datum);
     }

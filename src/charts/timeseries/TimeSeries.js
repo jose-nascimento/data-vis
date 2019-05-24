@@ -14,8 +14,8 @@ class TimeSeries extends Chart {
       bottom: 20,
       left: 20,
     },
-    accX: (d) => d,
-    accY: (d) => d,
+    selectX: (d) => d,
+    selectY: (d) => d,
     fill: 'none',
     stroke: 'black',
     strokeLinejoin: 'round',
@@ -25,9 +25,9 @@ class TimeSeries extends Chart {
 
   constructor(props) {
     super(props);
-    const { data, domain, width, height, nice, accX, accY } = props;    
-    const xDomain = domain ? domain.x : extent(data, accX);
-    const yDomain = domain ? domain.y : extent(data, accY);
+    const { data, domain, width, height, nice, selectX, selectY } = props;    
+    const xDomain = domain ? domain.x : extent(data, selectX);
+    const yDomain = domain ? domain.y : extent(data, selectY);
     let scaler = { x: scaleTime(), y: scaleLinear() };
     scaler.x = scaler.x.domain(xDomain).range([0, width]);//.clamp(true);
     scaler.y = scaler.y.domain(yDomain).range([height, 0]);//.clamp(true);
@@ -40,12 +40,12 @@ class TimeSeries extends Chart {
   }
 
   getX(d) {
-      let x = this.props.accX(d);
+      let x = this.props.selectX(d);
       return this.scale.x(x);
   }
 
   getY(d) {
-    let y = this.props.accY(d);
+    let y = this.props.selectY(d);
     return this.scale.y(y);
   }
 
@@ -54,9 +54,7 @@ class TimeSeries extends Chart {
     const { x, y } = this.scale;
 
     const l1 = line().curve(curveNatural).x(d => this.getX(d)).y(d => this.getY(d));
-    console.log(l1);
     const linePath = l1(data);
-    console.log(linePath);
        
     return (
       <svg

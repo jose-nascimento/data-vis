@@ -61,8 +61,8 @@ class Container extends Component {
               data={this.state.cdata}
               width={600}
               height={380}
-              accX={(d) => d.t}
-              accY={(d) => d.x}
+              selectX={(d) => d.t}
+              selectY={(d) => d.x}
             />
           ) : null}
         </svg>
