@@ -1,6 +1,6 @@
 import React from 'react';
 import Chart from '../Chart';
-import { min, max, extent } from 'd3-array';
+import { extent } from 'd3-array';
 import { scaleLinear, scaleTime } from 'd3-scale';
 import { line, curveNatural } from "d3-shape";
 
@@ -25,7 +25,7 @@ class TimeSeries extends Chart {
 
   constructor(props) {
     super(props);
-    const { data, domain, width, height, nice, accX, accY } = props;
+    const { data, domain, width, height, nice, accX, accY } = props;    
     const xDomain = domain ? domain.x : extent(data, accX);
     const yDomain = domain ? domain.y : extent(data, accY);
     let scaler = { x: scaleTime(), y: scaleLinear() };
@@ -35,16 +35,6 @@ class TimeSeries extends Chart {
       scaler.x = scaler.x.nice();
       scaler.y = scaler.y.nice();
     }
-    
-    
-    let { x, y, dx, dy, rx, ry } = { ...scaler, dx: scaler.x.domain(), dy: scaler.y.domain(), rx: scaler.x.range(), ry: scaler.y.range()};
-    let [ max, mix ] = extent(data, accX), [ may, miy ] = extent(data, accY);
-    console.log(`Dx: from ${max} to ${mix}; Dy: from ${may} to ${miy}`);
-    
-    console.log( `X: domain: ${dx}; range: ${rx}`);
-    console.log( `Y: domain: ${dy}; range: ${ry}`);
-    // let ak = mapToDate(data, (d) => d.t);
-    // timeseries.slice(0, 21).forEach(console.log);
 
     this.scale = { ...scaler };
   }

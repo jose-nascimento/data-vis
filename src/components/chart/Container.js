@@ -2,10 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Histogram from '../../charts/histogram/Histogram';
 import TimeSeries from '../../charts/timeseries/TimeSeries';
-// import { dsvFormat } from "d3-dsv";
 import { dsv } from "d3-fetch";
 import { mapToDate } from "../../charts/timeseries/helpers";
-// const timeseries = csvLoader('../../../public/timeseries.csv');
 
 const style = {
   color: '#EEE',
@@ -35,7 +33,7 @@ class Container extends Component {
 
   componentDidMount() {
     dsv(' ', '/public/timeseries.csv', d => d).then(data => {
-      const timeseries = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: data[i].x}));
+      const timeseries = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: +data[i].x}));
       
       this.setState({cdata: timeseries, loaded: true});
     })
@@ -43,7 +41,6 @@ class Container extends Component {
 
   render() {
     const { width, height, margin, group: Group, ...props } = { ...this.props };
-    // const cdata = dsvFormat(' ').parse(timeseries);
     return (
       <figure style={style}>
         <svg
