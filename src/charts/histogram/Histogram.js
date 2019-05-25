@@ -1,6 +1,6 @@
 import React from 'react';
 import Chart from '../Chart';
-import { histogram, min, max, extent } from 'd3-array';
+import { histogram, max, extent } from 'd3-array';
 import { scaleLinear } from 'd3-scale';
 import { Bar } from './helpers';
 
@@ -42,6 +42,7 @@ class Histogram extends Chart {
     const { width, height, margin, fill, stroke, strokeLinejoin, strokeLinecap, strokeWidth, ...props } = this.props;
     return (
       <svg
+        className='Histogram'
         viewBox={`-${margin.left} -${margin.top} ${width +
           margin.left +
           margin.right} ${height + margin.top + margin.bottom}`}

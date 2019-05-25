@@ -1,10 +1,9 @@
 import React from 'react';
 import Chart from '../Chart';
 import { extent } from 'd3-array';
-import { scaleLinear, scaleTime } from 'd3-scale';
-import { line, curveNatural } from 'd3-shape';
+import { scaleLinear } from 'd3-scale';
 
-class TimeSeries extends Chart {
+class Scatterplot extends Chart {
   static defaultProps = {
     width: 640,
     height: 640,
@@ -16,18 +15,10 @@ class TimeSeries extends Chart {
     },
     selectX: d => d,
     selectY: d => d,
-    fill: 'none',
-    stroke: 'black',
-    strokeLinejoin: 'round',
-    strokeLinecap: 'round',
-    strokeWidth: '1',
-    dotProps: {
-      r: 1,
-      fill: 'none',
-      stroke: 'none',
-      strokeWidth: 0,
-    },
-    dots: {},
+    fill: 'black',
+    stroke: 'none',
+    strokeWidth: 0,
+    r: 4,
   };
 
   constructor(props) {
@@ -40,7 +31,7 @@ class TimeSeries extends Chart {
     const { data, domain, width, height, nice, selectX, selectY } = this.props;
     const xDomain = domain ? domain.x : extent(data, selectX);
     const yDomain = domain ? domain.y : extent(data, selectY);
-    let { sx, sy } = { sx: scaleTime(), sy: scaleLinear() };
+    let { sx, sy } = { sx: scaleLinear(), sy: scaleLinear() };
     sx = sx.domain(xDomain).range([0, width]); //.clamp(true);
     sy = sy.domain(yDomain).range([height, 0]); //.clamp(true);
 
@@ -78,6 +69,7 @@ class TimeSeries extends Chart {
       height,
       margin,
       data,
+      r,
       fill,
       stroke,
       strokeLinejoin,
@@ -85,32 +77,23 @@ class TimeSeries extends Chart {
       strokeWidth,
       selectX,
       selectY,
-      dotProps,
-      dots,
       ...props
     } = this.props;
     const datapoints = this.state.datapoints;
     const { x: dx, y: dy } = this.state.domain;
     // const { x: rx, y: ry } = this.state.range;
-
-    const l1 = line()
-      .curve(curveNatural)
-      .x(d => d.x)
-      .y(d => d.y);
-    const linePath = l1(datapoints);
-
     return (
       <svg
-        className='Timeseries'
+        className="Scatterplot"
         viewBox={`-${margin.left} -${margin.top} ${width +
           margin.left +
           margin.right} ${height + margin.top + margin.bottom}`}
-        preserveAspectRatio='xMinYMax meet'
+        preserveAspectRatio="xMinYMax meet"
         x={this.props.x}
         y={this.props.y}
       >
         <g
-          className='path'
+          className="points"
           fill={fill}
           stroke={stroke}
           strokeLinejoin={strokeLinejoin}
@@ -122,23 +105,19 @@ class TimeSeries extends Chart {
           data-y-domain-to={dy[1]}
           {...props}
         >
-          <path d={linePath} />
-          <g className='dots'>
-            {data.map((d, i) => {
-              return (
-                <circle
-                  key={i}
-                  className='dot'
-                  cx={datapoints[i].x}
-                  cy={datapoints[i].y}
-                  data-x={selectX(d)}
-                  data-y={selectY(d)}
-                  {...dotProps}
-                  {...dots}
-                />
-              );
-            })}
-          </g>
+          {data.map((d, i) => {
+            return (
+              <circle
+                key={i}
+                className="point"
+                cx={datapoints[i].x}
+                cy={datapoints[i].y}
+                r={r}
+                data-x={selectX(d)}
+                data-y={selectY(d)}
+              />
+            );
+          })}
         </g>
       </svg>
     );
@@ -150,11 +129,7 @@ class TimeSeries extends Chart {
     } else {
       return null; //TODO: Loading component
     }
-    // data-x-range-from={rx[0]}
-    // data-x-range-to={rx[1]}
-    // data-y-range-from={ry[0]}
-    // data-y-range-to={ry[1]}
   }
 }
 
-export default TimeSeries;
+export default Scatterplot;
