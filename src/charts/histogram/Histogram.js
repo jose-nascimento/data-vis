@@ -3,6 +3,7 @@ import Chart from '../Chart';
 import { histogram, max, extent } from 'd3-array';
 import { scaleLinear } from 'd3-scale';
 import { Bar } from './helpers';
+import Axis from "../../components/Axis";
 
 class Histogram extends Chart {
   static defaultProps = {
@@ -10,9 +11,9 @@ class Histogram extends Chart {
     height: 640,
     margin: {
       top: 20,
-      right: 20,
+      right: 30,
       bottom: 20,
-      left: 20,
+      left: 30,
     },
     fill: 'black',
     stroke: 'black',
@@ -39,7 +40,8 @@ class Histogram extends Chart {
     this.state = {histogram: bins, scale: {x: scale, y: scaleY}};
   }
   render() {
-    const { width, height, margin, fill, stroke, strokeLinejoin, strokeLinecap, strokeWidth, ...props } = this.props;
+    const { width, height, margin, fill, stroke, strokeLinejoin, strokeLinecap, strokeWidth, nice ,...props } = this.props;
+    
     return (
       <svg
         className='Histogram'
@@ -48,12 +50,15 @@ class Histogram extends Chart {
           margin.right} ${height + margin.top + margin.bottom}`}
         preserveAspectRatio="xMinYMin meet"
       >
+        <Axis axis='x' position='bottom' height={height} scale={this.state.scale.x} color='black' />
+        <Axis axis='y' position='left' width={width} scale={this.state.scale.y} offset='2' color='palevioletred' />
         <g
           fill={fill}
           stroke={stroke}
           strokeLinejoin={strokeLinejoin}
           strokeLinecap={strokeLinecap}
           strokeWidth={strokeWidth}
+          {...props}
         >
           {this.state.histogram.map((d, i) => {
             return (

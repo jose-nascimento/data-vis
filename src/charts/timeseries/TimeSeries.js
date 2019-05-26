@@ -10,9 +10,9 @@ class TimeSeries extends Chart {
     height: 640,
     margin: {
       top: 20,
-      right: 20,
+      right: 30,
       bottom: 20,
-      left: 20,
+      left: 30,
     },
     selectX: d => d,
     selectY: d => d,
@@ -91,7 +91,9 @@ class TimeSeries extends Chart {
     } = this.props;
     const datapoints = this.state.datapoints;
     const { x: dx, y: dy } = this.state.domain;
+    const { r, ...dotStyle } = { ...dotProps, ...dots };
     // const { x: rx, y: ry } = this.state.range;
+    
 
     const l1 = line()
       .curve(curveNatural)
@@ -123,7 +125,7 @@ class TimeSeries extends Chart {
           {...props}
         >
           <path d={linePath} />
-          <g className='dots'>
+          <g className='dots' {...dotStyle}>
             {data.map((d, i) => {
               return (
                 <circle
@@ -133,8 +135,7 @@ class TimeSeries extends Chart {
                   cy={datapoints[i].y}
                   data-x={selectX(d)}
                   data-y={selectY(d)}
-                  {...dotProps}
-                  {...dots}
+                  r={r}
                 />
               );
             })}

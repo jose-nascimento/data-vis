@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Histogram from '../../charts/histogram/Histogram';
 import TimeSeries from '../../charts/timeseries/TimeSeries';
-import { dsv } from "d3-fetch";
-import { mapToDate } from "../../charts/timeseries/helpers";
+import { dsv } from 'd3-fetch';
+import { mapToDate } from '../../charts/timeseries/helpers';
 import Scatterplot from '../../charts/scatterplot/Scatterplot';
 
 const style = {
@@ -42,7 +42,7 @@ class Container extends Component {
   componentDidMount() {
     dsv(' ', '/public/timeseries.csv', d => d).then(data => {
       const timeseries = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: +data[i].x}));
-      const scatterplot = data.slice(0, 100).map((d, i) => ({x: +d.y, y: +d.z}));
+      const scatterplot = data.slice(0, 100).map((d, i) => ({x: +d.y, y: +d.z, c: +d.x}));
       
       this.setState({cdata: timeseries, sdata: scatterplot, loaded: true});
     })
@@ -53,25 +53,25 @@ class Container extends Component {
     return (
       <figure style={style}>
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink"
+          xmlns='http://www.w3.org/2000/svg'
+          xmlnsXlink='http://www.w3.org/1999/xlink'
           viewBox={`-${margin.left} -${margin.top} ${width +
             margin.left +
             margin.right} ${height + margin.top + margin.bottom}`}
-          preserveAspectRatio="xMinYMax meet"
-          width="100%"
-          height="auto"
+          preserveAspectRatio='xMinYMax meet'
           style={{ maxHeight: '75vh' }}
         >
           {this.state.loaded ? (
             <TimeSeries
               data={this.state.cdata}
               width={600}
-              height={380}
+              height={400}
               selectX={d => d.t}
               selectY={d => d.x}
-              strokeDasharray={1}
-              dots={{ fill: 'lightblue' }}
+              strokeWidth={4}
+              strokeDasharray={5}
+              stroke='#29b6f6'
+              dots={{fill: '#5b6bc0', r: 3}}
             />
           ) : null}
           
@@ -84,7 +84,9 @@ class Container extends Component {
               height={600}
               selectX={d => d.x}
               selectY={d => d.y}
-              fill="lightblue"
+              selectColor={d => d.c}
+              fill='#ffa600'
+              scheme='Dark2'
             />
           ) : null}
         </svg>
