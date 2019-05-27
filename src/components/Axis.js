@@ -67,7 +67,11 @@ componentDidMount() {
   render() {
     const { axis, position, height, width, offset, scale, ticks, tickFormat, ...props } = this.props;
     const { transform, length, direction } = Axis.positionalProps[position];
+    console.log('axis', width);
+    
     const lengthUnit = length? height : width;
+    console.log('axis2', length, offset);
+    
     const relOffset = (offset? offset : 1) * direction;
     
     return (

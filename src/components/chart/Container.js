@@ -7,6 +7,8 @@ import { dsv } from 'd3-fetch';
 import { mapToDate } from '../../charts/timeseries/helpers';
 import Scatterplot from '../../charts/scatterplot/Scatterplot';
 import Axis from "../Axis";
+import Scatterplots from '../../charts/scatterplot/Scatterplots';
+import TimeSeriesCollection from '../../charts/timeseries/TimeSeriesCollection';
 
 const style = {
   color: '#EEE',
@@ -41,15 +43,19 @@ class Container extends Component {
   componentDidMount() {
     dsv(' ', '/public/timeseries.csv', d => d).then(data => {
       const timeseries = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: +data[i].x}));
+      const timeseries2 = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: +data[i].y}));
+      const timeseries3 = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: +data[i].z}));
       const scatterplot = data.slice(0, 100).map((d, i) => ({x: +d.y, y: +d.z, c: +d.x}));
+      const scatterplot2 = data.slice(0, 100).map((d, i) => ({x: +d.x, y: +d.y, c: +d.z}));
+      const scatterplot3 = data.slice(0, 100).map((d, i) => ({x: +d.z, y: +d.x, c: +d.y}));
       
-      this.setState({cdata: timeseries, sdata: scatterplot, loaded: true});
+      this.setState({cdata: timeseries, cdata2: timeseries2, cdata3: timeseries3, sdata: scatterplot, sdata2: scatterplot2, sdata3: scatterplot3, loaded: true});
     })
   }
 
   render() {
     const { width, height, margin, group: Group, ...props } = { ...this.props };
-    const hxAxis = <Axis axis='x' color='black' />;
+    const hxAxis = <Axis axis='x' color='black'/>;
     const hyAxis = <Axis axis='y' color='palevioletred' offset='2' tickFormat={t => `${t*(-1)}k`} />;
     return (
       <figure className='chart-container' style={style}>
@@ -63,20 +69,38 @@ class Container extends Component {
           style={{ maxHeight: '75vh' }}
         >
           {this.state.loaded ? (
-            <TimeSeries
-              data={this.state.cdata}
-              width={600}
-              height={400}
-              selectX={d => d.t}
-              selectY={d => d.x}
-              strokeWidth={4}
-              strokeDasharray={5}
-              stroke='#29b6f6'
-              dots={{fill: '#5b6bc0', r: 3}}
-            />
+            <TimeSeriesCollection axisBottom={hxAxis} axisLeft={hyAxis} width={600} height={600}>
+              <TimeSeries
+                data={this.state.cdata}
+                selectX={d => d.t}
+                selectY={d => d.x}
+                strokeWidth={4}
+                strokeDasharray={5}
+                stroke='#29b6f6'
+                dots={{fill: '#5b6bc0', r: 3}}
+              />
+              <TimeSeries
+                data={this.state.cdata2}
+                selectX={d => d.t}
+                selectY={d => d.x}
+                strokeWidth={4}
+                strokeDasharray={5}
+                stroke='#ff7c43'
+                dots={{fill: '#ffa600', r: 3}}
+              />
+              <TimeSeries
+                data={this.state.cdata3}
+                selectX={d => d.t}
+                selectY={d => d.x}
+                strokeWidth={4}
+                strokeDasharray={5}
+                stroke='#d45087'
+                dots={{fill: '#f95d6a', r: 3}}
+              />
+            </TimeSeriesCollection>
           ) : null}
 
-          <Histograms width={320} height={320} axisBottom={hxAxis} axisLeft={hyAxis}>
+          <Histograms width={320} height={320}>
             <Histogram data={data} nice />
             <Histogram data={data} nice />
             <Histogram data={data} nice />
@@ -86,16 +110,38 @@ class Container extends Component {
           
 
           {this.state.loaded ? (
-            <Scatterplot
-              data={this.state.sdata}
-              width={600}
-              height={600}
-              selectX={d => d.x}
-              selectY={d => d.y}
-              selectColor={d => d.c}
-              fill='#ffa600'
-              scheme='Dark2'
-            />
+            <Scatterplots margin={{top: 20, right: 42, bottom: 20, left: 30,}} >
+              <Scatterplot
+                data={this.state.sdata}
+                width={600}
+                height={600}
+                selectX={d => d.x}
+                selectY={d => d.y}
+                selectColor={d => d.c}
+                fill='#ffa600'
+                scheme='Dark2'
+              />
+              <Scatterplot
+                data={this.state.sdata2}
+                width={600}
+                height={600}
+                selectX={d => d.x}
+                selectY={d => d.y}
+                selectColor={d => d.c}
+                fill='#ff4500'
+                scheme='Set1'
+              />
+              <Scatterplot
+                data={this.state.sdata3}
+                width={600}
+                height={600}
+                selectX={d => d.x}
+                selectY={d => d.y}
+                selectColor={d => d.c}
+                fill='#palevioletred'
+                scheme='Accent'
+              />
+            </Scatterplots>
           ) : null}
         </svg>
       </figure>

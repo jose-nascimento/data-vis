@@ -30,3 +30,28 @@ export function mapToDate(arr, mapFn = null, range = null) {
 
     return acc.map((d) => toDate(d));
 }
+
+export function load(props) {
+    const { data, domain, width, height, nice, selectX, selectY } = props;
+    const xDomain = domain ? domain.x : extent(data, selectX);
+    const yDomain = domain ? domain.y : extent(data, selectY);
+    let { sx, sy } = { sx: scaleTime(), sy: scaleLinear() };
+    sx = sx.domain(xDomain).range([0, width]); //.clamp(true);
+    sy = sy.domain(yDomain).range([height, 0]); //.clamp(true);
+
+    if (nice) {
+      sx = sx.nice();
+      sy = sy.nice();
+    }
+
+    let datapoints = props.data.map(d => ({
+      x: sx(selectX(d)),
+      y: sy(selectY(d)),
+    }));
+
+    return {
+        datapoints,
+        scale: { x: sx, y: sy },
+        domain: { x: xDomain, y: yDomain },
+    };
+}

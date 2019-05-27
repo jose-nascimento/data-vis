@@ -1,8 +1,7 @@
 import React from 'react';
 import Chart, { withAxes } from '../Chart';
 import { extent } from 'd3-array';
-import { scaleLinear, scaleOrdinal } from 'd3-scale';
-import schemes from '../../schemes/categorical';
+import { load } from "./helpers";
 
 class Scatterplot extends Chart {
   static defaultProps = {
@@ -16,42 +15,24 @@ class Scatterplot extends Chart {
   constructor(props) {
     super(props);
 
-    this.state = { loaded: false };
+    const { loaded, datapoints, domain, colorScale } = props;
+
+    if (loaded) {
+      this.state = { loaded, datapoints, domain, colorScale };
+    } else {
+      this.state = { loaded: false };
+    }
+
   }
 
   componentDidMount() {
-    const { data, domain, width, height, scheme, nice, selectX, selectY, selectColor } = this.props;
-    const xDomain = domain ? domain.x : extent(data, selectX);
-    const yDomain = domain ? domain.y : extent(data, selectY);
-    let { sx, sy } = { sx: scaleLinear(), sy: scaleLinear() };
-    sx = sx.domain(xDomain).range([0, width]); //.clamp(true);
-    sy = sy.domain(yDomain).range([height, 0]); //.clamp(true);
     
-    let colorScale;
-    if (selectColor) {
-      let colorScheme = scheme? schemes[scheme] : schemes.Category10;
-      colorScale = scaleOrdinal(colorScheme).domain(extent(data, selectColor));
-    } else {
-      colorScale = undefined;
+    if (this.state && !this.state.loaded) {
+      
+      let state = load(this.props)
+      this.setState({...state, loaded: true});
     }
 
-    if (nice) {
-      sx = sx.nice();
-      sy = sy.nice();
-    }
-
-    let datapoints = this.props.data.map(d => ({
-      x: sx(selectX(d)),
-      y: sy(selectY(d)),
-    }));
-
-    this.setState({
-      datapoints,
-      scale: { x: sx, y: sy },
-      domain: { x: xDomain, y: yDomain },
-      colorScale,
-      loaded: true,
-    });
   }
 
   getX(d) {
@@ -87,6 +68,10 @@ class Scatterplot extends Chart {
       axisRight,
       axisBottom,
       axisLeft, 
+      loaded,
+      datapoints: plot,
+      domain,
+      colorScale: cs,
       ...props
     } = this.props;
     const datapoints = this.state.datapoints;

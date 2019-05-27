@@ -3,6 +3,7 @@ import Chart, { withAxes } from '../Chart';
 import { extent } from 'd3-array';
 import { scaleLinear, scaleTime } from 'd3-scale';
 import { line, curveNatural } from 'd3-shape';
+import { load } from './helpers';
 
 class TimeSeries extends Chart {
   static defaultProps = {
@@ -26,33 +27,23 @@ class TimeSeries extends Chart {
   constructor(props) {
     super(props);
 
-    this.state = { loaded: false };
+    const { loaded, datapoints, domain, colorScale } = props;
+
+    if (loaded) {
+      this.state = { loaded, datapoints, domain, colorScale };
+    } else {
+      this.state = { loaded: false };
+    }
+
   }
 
   componentDidMount() {
-    const { data, domain, width, height, nice, selectX, selectY } = this.props;
-    const xDomain = domain ? domain.x : extent(data, selectX);
-    const yDomain = domain ? domain.y : extent(data, selectY);
-    let { sx, sy } = { sx: scaleTime(), sy: scaleLinear() };
-    sx = sx.domain(xDomain).range([0, width]); //.clamp(true);
-    sy = sy.domain(yDomain).range([height, 0]); //.clamp(true);
 
-    if (nice) {
-      sx = sx.nice();
-      sy = sy.nice();
+    if (this.state && !this.state.loaded) {
+      let state = load(this.props)
+      this.setState({...state, loaded: true});
     }
 
-    let datapoints = this.props.data.map(d => ({
-      x: sx(selectX(d)),
-      y: sy(selectY(d)),
-    }));
-
-    this.setState({
-      datapoints: datapoints,
-      scale: { x: sx, y: sy },
-      domain: { x: xDomain, y: yDomain },
-      loaded: true,
-    });
   }
 
   getX(d) {
@@ -84,6 +75,9 @@ class TimeSeries extends Chart {
       axisRight,
       axisBottom,
       axisLeft,
+      loaded,
+      datapoints: plot,
+      domain,
       ...props
     } = this.props;
     const datapoints = this.state.datapoints;
