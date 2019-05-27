@@ -16,3 +16,9 @@
     margin-bottom: 3.5rem;
   }
   
+  @media only screen and (min-width: 64.063em) {
+    .chart-container {
+      min-width: 64.063rem;
+      width: 80vw;
+    }
+  }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { axisTop, axisRight, axisBottom, axisLeft} from 'd3-axis';
+import { axisTop, axisRight, axisBottom, axisLeft } from 'd3-axis';
 import { select } from "d3-selection";
 
 class Axis extends Component {
@@ -42,24 +42,30 @@ class Axis extends Component {
     this.axisRef = React.createRef();
   }
 
-renderAxis(ref, axis, scale) {
+renderAxis(ref, axis) {
 
     return function() {
-        select(ref.current).call(axis(scale));
+        select(ref.current).call(axis);
     };
 
 }
 
 componentDidMount() {
-    let { axis } = Axis.positionalProps[this.props.position];
-    //let thisAxis = axisBottom(this.props.scale);
-    let renderer = this.renderAxis(this.axisRef, axis, this.props.scale)
-    //select(this.axisRef.current).call(thisAxis(this.props.scale));
-    //select('g .Axis').call(thisAxis(this.props.scale));
-    setTimeout(() => window.requestAnimationFrame(renderer), 0);
+  
+  const { axis: axisScale, ticks, tickFormat } = this.props;
+  const scale = (axisScale === 'x')? this.props.scale.x : this.props.scale.y;    
+  const { axis } = Axis.positionalProps[this.props.position];
+  const axisFn = axis(scale);
+  if (ticks) axisFn.ticks(ticks);
+  if (tickFormat) axisFn.tickFormat(tickFormat);
+
+
+  let renderer = this.renderAxis(this.axisRef, axisFn)
+  setTimeout(() => window.requestAnimationFrame(renderer), 0);
   }
+
   render() {
-    const { axis, position, height, width, offset, scale, ...props } = this.props;
+    const { axis, position, height, width, offset, scale, ticks, tickFormat, ...props } = this.props;
     const { transform, length, direction } = Axis.positionalProps[position];
     const lengthUnit = length? height : width;
     const relOffset = (offset? offset : 1) * direction;

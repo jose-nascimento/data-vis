@@ -1,19 +1,12 @@
 import React from 'react';
-import Chart from '../Chart';
+import Chart, { withAxes } from '../Chart';
 import { extent } from 'd3-array';
 import { scaleLinear, scaleTime } from 'd3-scale';
 import { line, curveNatural } from 'd3-shape';
 
 class TimeSeries extends Chart {
   static defaultProps = {
-    width: 640,
-    height: 640,
-    margin: {
-      top: 20,
-      right: 30,
-      bottom: 20,
-      left: 30,
-    },
+    ...super.defaultProps,
     selectX: d => d,
     selectY: d => d,
     fill: 'none',
@@ -87,6 +80,10 @@ class TimeSeries extends Chart {
       selectY,
       dotProps,
       dots,
+      axisTop,
+      axisRight,
+      axisBottom,
+      axisLeft,
       ...props
     } = this.props;
     const datapoints = this.state.datapoints;
@@ -111,6 +108,7 @@ class TimeSeries extends Chart {
         x={this.props.x}
         y={this.props.y}
       >
+        {this.renderAxis()}
         <g
           className='path'
           fill={fill}
@@ -145,17 +143,17 @@ class TimeSeries extends Chart {
     );
   }
 
-  render() {
-    if (this.state.loaded) {
-      return this.renderChart();
-    } else {
-      return null; //TODO: Loading component
-    }
-    // data-x-range-from={rx[0]}
-    // data-x-range-to={rx[1]}
-    // data-y-range-from={ry[0]}
-    // data-y-range-to={ry[1]}
-  }
+  // render() {
+  //   if (this.state.loaded) {
+  //     return this.renderChart();
+  //   } else {
+  //     return null; //TODO: Loading component
+  //   }
+  //   // data-x-range-from={rx[0]}
+  //   // data-x-range-to={rx[1]}
+  //   // data-y-range-from={ry[0]}
+  //   // data-y-range-to={ry[1]}
+  // }
 }
 
-export default TimeSeries;
+export default withAxes(TimeSeries);

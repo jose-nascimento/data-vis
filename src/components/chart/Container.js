@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Histogram from '../../charts/histogram/Histogram';
+import Histograms from '../../charts/histogram/Histograms';
 import TimeSeries from '../../charts/timeseries/TimeSeries';
 import { dsv } from 'd3-fetch';
 import { mapToDate } from '../../charts/timeseries/helpers';
 import Scatterplot from '../../charts/scatterplot/Scatterplot';
+import Axis from "../Axis";
 
 const style = {
   color: '#EEE',
   backgroundColor: '#fff',
-  width: '100%',
   height: 'auto',
-  maxHeight: '75vh',
-  maxWidth: '64.063rem',
   margin: '0 auto',
   fontSize: 0,
   display: 'block',
@@ -50,8 +49,10 @@ class Container extends Component {
 
   render() {
     const { width, height, margin, group: Group, ...props } = { ...this.props };
+    const hxAxis = <Axis axis='x' color='black' />;
+    const hyAxis = <Axis axis='y' color='palevioletred' offset='2' tickFormat={t => `${t*(-1)}k`} />;
     return (
-      <figure style={style}>
+      <figure className='chart-container' style={style}>
         <svg
           xmlns='http://www.w3.org/2000/svg'
           xmlnsXlink='http://www.w3.org/1999/xlink'
@@ -74,8 +75,15 @@ class Container extends Component {
               dots={{fill: '#5b6bc0', r: 3}}
             />
           ) : null}
+
+          <Histograms width={320} height={320} axisBottom={hxAxis} axisLeft={hyAxis}>
+            <Histogram data={data} nice />
+            <Histogram data={data} nice />
+            <Histogram data={data} nice />
+            <Histogram data={data} nice />
+            <Histogram data={data} nice />
+          </Histograms>
           
-          <Histogram data={data} width={320} height={320} nice />
 
           {this.state.loaded ? (
             <Scatterplot

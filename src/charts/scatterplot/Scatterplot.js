@@ -1,24 +1,15 @@
 import React from 'react';
-import Chart from '../Chart';
+import Chart, { withAxes } from '../Chart';
 import { extent } from 'd3-array';
 import { scaleLinear, scaleOrdinal } from 'd3-scale';
 import schemes from '../../schemes/categorical';
 
 class Scatterplot extends Chart {
   static defaultProps = {
-    width: 640,
-    height: 640,
-    margin: {
-      top: 20,
-      right: 30,
-      bottom: 20,
-      left: 30,
-    },
+    ...super.defaultProps,
     selectX: d => d,
     selectY: d => d,
-    fill: 'black',
     stroke: 'none',
-    strokeWidth: 0,
     r: 4,
   };
 
@@ -92,6 +83,10 @@ class Scatterplot extends Chart {
       selectX,
       selectY,
       selectColor,
+      axisTop,
+      axisRight,
+      axisBottom,
+      axisLeft, 
       ...props
     } = this.props;
     const datapoints = this.state.datapoints;
@@ -108,6 +103,7 @@ class Scatterplot extends Chart {
         x={this.props.x}
         y={this.props.y}
       >
+        {this.renderAxis()}
         <g
           className='points'
           fill={fill}
@@ -140,14 +136,6 @@ class Scatterplot extends Chart {
       </svg>
     );
   }
-
-  render() {
-    if (this.state.loaded) {
-      return this.renderChart();
-    } else {
-      return null; //TODO: Loading component
-    }
-  }
 }
 
-export default Scatterplot;
+export default withAxes(Scatterplot);
