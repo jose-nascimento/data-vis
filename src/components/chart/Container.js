@@ -100,7 +100,7 @@ class Container extends Component {
             </TimeSeriesCollection>
           ) : null}
 
-          <Histograms width={320} height={320}>
+          <Histograms width={600} height={600}>
             <Histogram data={data} nice />
             <Histogram data={data} nice />
             <Histogram data={data} nice />
@@ -110,11 +110,9 @@ class Container extends Component {
           
 
           {this.state.loaded ? (
-            <Scatterplots margin={{top: 20, right: 42, bottom: 20, left: 30,}} >
+            <Scatterplots margin={{top: 20, right: 42, bottom: 20, left: 30}} width={600} height={600}>
               <Scatterplot
                 data={this.state.sdata}
-                width={600}
-                height={600}
                 selectX={d => d.x}
                 selectY={d => d.y}
                 selectColor={d => d.c}
@@ -123,8 +121,6 @@ class Container extends Component {
               />
               <Scatterplot
                 data={this.state.sdata2}
-                width={600}
-                height={600}
                 selectX={d => d.x}
                 selectY={d => d.y}
                 selectColor={d => d.c}
@@ -133,8 +129,6 @@ class Container extends Component {
               />
               <Scatterplot
                 data={this.state.sdata3}
-                width={600}
-                height={600}
                 selectX={d => d.x}
                 selectY={d => d.y}
                 selectColor={d => d.c}
