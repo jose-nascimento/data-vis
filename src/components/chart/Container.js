@@ -9,6 +9,7 @@ import Scatterplot from '../../charts/scatterplot/Scatterplot';
 import Axis from "../Axis";
 import Scatterplots from '../../charts/scatterplot/Scatterplots';
 import TimeSeriesCollection from '../../charts/timeseries/TimeSeriesCollection';
+import { addBrush } from './brush';
 
 const style = {
   color: '#EEE',
@@ -37,6 +38,8 @@ class Container extends Component {
   constructor(props) {
     super(props);
 
+    this.thisRef = React.createRef();
+
     this.state = {loaded: false};
   }
 
@@ -48,8 +51,17 @@ class Container extends Component {
       const scatterplot = data.slice(0, 100).map((d, i) => ({x: +d.y, y: +d.z, c: +d.x}));
       const scatterplot2 = data.slice(0, 100).map((d, i) => ({x: +d.x, y: +d.y, c: +d.z}));
       const scatterplot3 = data.slice(0, 100).map((d, i) => ({x: +d.z, y: +d.x, c: +d.y}));
-      
+
       this.setState({cdata: timeseries, cdata2: timeseries2, cdata3: timeseries3, sdata: scatterplot, sdata2: scatterplot2, sdata3: scatterplot3, loaded: true});
+
+      console.log(this.props.width, this.props.height);
+
+      console.log(this.thisRef);
+
+      const brush = addBrush(this.thisRef.current, [0, 0], [this.props.width, this.props.height]);
+
+      console.log('furfles', brush);
+
     })
   }
 
@@ -58,7 +70,7 @@ class Container extends Component {
     const hxAxis = <Axis axis='x' color='black'/>;
     const hyAxis = <Axis axis='y' color='palevioletred' offset='2' tickFormat={t => `${t*(-1)}k`} />;
     return (
-      <figure className='chart-container' style={style}>
+      <figure className='chart-container' ref={this.thisRef} id='chart1' style={style}>
         <svg
           xmlns='http://www.w3.org/2000/svg'
           xmlnsXlink='http://www.w3.org/1999/xlink'
@@ -107,7 +119,7 @@ class Container extends Component {
             <Histogram data={data} nice />
             <Histogram data={data} nice />
           </Histograms>
-          
+
 
           {this.state.loaded ? (
             <Scatterplots margin={{top: 20, right: 42, bottom: 20, left: 30}} width={600} height={600}>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { axisTop, axisRight, axisBottom, axisLeft } from 'd3-axis';
-import { select } from "d3-selection";
+import { select } from 'd3-selection';
 
 class Axis extends Component {
 
@@ -51,9 +51,9 @@ renderAxis(ref, axis) {
 }
 
 componentDidMount() {
-  
+
   const { axis: axisScale, ticks, tickFormat } = this.props;
-  const scale = (axisScale === 'x')? this.props.scale.x : this.props.scale.y;    
+  const scale = (axisScale === 'x')? this.props.scale.x : this.props.scale.y;
   const { axis } = Axis.positionalProps[this.props.position];
   const axisFn = axis(scale);
   if (ticks) axisFn.ticks(ticks);
@@ -67,13 +67,11 @@ componentDidMount() {
   render() {
     const { axis, position, height, width, offset, scale, ticks, tickFormat, ...props } = this.props;
     const { transform, length, direction } = Axis.positionalProps[position];
-    console.log('axis', width);
-    
+
     const lengthUnit = length? height : width;
-    console.log('axis2', length, offset);
-    
+
     const relOffset = (offset? offset : 1) * direction;
-    
+
     return (
       <g
         className={`Axis ${axis}-axis`}
