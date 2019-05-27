@@ -70,7 +70,7 @@ class Container extends Component {
     const hxAxis = <Axis axis='x' color='black'/>;
     const hyAxis = <Axis axis='y' color='palevioletred' offset='2' tickFormat={t => `${t*(-1)}k`} />;
     return (
-      <figure className='chart-container' ref={this.thisRef} id='chart1' style={style}>
+      <figure className='chart-container' id='chart1' style={style}>
         <svg
           xmlns='http://www.w3.org/2000/svg'
           xmlnsXlink='http://www.w3.org/1999/xlink'
@@ -80,6 +80,7 @@ class Container extends Component {
           preserveAspectRatio='xMinYMax meet'
           style={{ maxHeight: '75vh' }}
         >
+          <g className='brush' ref={this.thisRef}>
           {this.state.loaded ? (
             <TimeSeriesCollection axisBottom={hxAxis} axisLeft={hyAxis} width={600} height={600}>
               <TimeSeries
@@ -149,6 +150,7 @@ class Container extends Component {
               />
             </Scatterplots>
           ) : null}
+          </g>
         </svg>
       </figure>
     );

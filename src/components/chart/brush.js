@@ -19,9 +19,13 @@ import { select } from 'd3-selection';
 //         });
 // }
 
+function brusher() {
+  console.log('brushed');
+}
+
 export function addBrush(node, startPoint, area) {
 
-    const currentBrush = select(node).call(brush().extent(startPoint, area));
+    const currentBrush = select(node).call(brush().on('brush', brusher));
     console.log('addBrush', currentBrush);
     return currentBrush;
     //brush() .on("start brush", brushed);
