@@ -30,6 +30,7 @@ class Histogram extends Chart {
           margin.left +
           margin.right} ${height + margin.top + margin.bottom}`}
         preserveAspectRatio="xMinYMin meet"
+        height={height}
       >
         {this.renderAxis()}
         <g

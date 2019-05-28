@@ -3,6 +3,7 @@ import Chart, { withAxes } from '../Chart';
 import { max, min } from 'd3-array';
 import { scaleLinear } from 'd3-scale';
 import { load } from './helpers';
+import { Brush } from '../../components/chart/brush';
 
 class TimeSeriesCollection extends Chart {
 
@@ -44,8 +45,14 @@ class TimeSeriesCollection extends Chart {
     let scaleY = scaleLinear().range([height, 0]).domain(yDomain);
 
     this.state = {scale: {x: scaleX, y: scaleY}, plots: plotData}
+
+    this.thisRef = React.createRef();
     
 
+  }
+
+  componentDidMount() {
+    this.brush = new Brush(this.thisRef.current, this.state.scale);
   }
 
   render() {
@@ -59,10 +66,13 @@ class TimeSeriesCollection extends Chart {
           margin.left +
           margin.right} ${height + margin.top + margin.bottom}`}
         preserveAspectRatio="xMinYMin meet"
+        height={height}
+        width={width}
       >
         {this.renderAxis()}
         <g
           className='timeseries-group'
+          ref={this.thisRef}
         >  
         {React.Children.map(children, (child, i) => {
           return (

@@ -4,7 +4,7 @@ import { extent } from 'd3-array';
 import { scaleLinear, scaleTime } from 'd3-scale';
 import { line, curveNatural } from 'd3-shape';
 import { load } from './helpers';
-import { BrushContext, applyBrush } from '../../components/chart/brush';
+import { applyBrush } from '../../components/chart/brush';
 
 class TimeSeries extends Chart {
   static defaultProps = {
@@ -45,11 +45,9 @@ class TimeSeries extends Chart {
     if (this.state && !this.state.loaded) {
       let state = load(this.props)
       this.setState({...state, loaded: true});
-    }
+    } 
 
-    console.log(this.context);    
-
-    this.context('end', 'timeseries', applyBrush(this.thisRef.current));
+    // this.context('end', 'timeseries', applyBrush(this.thisRef.current));
 
   }
 
@@ -157,6 +155,6 @@ class TimeSeries extends Chart {
   // }
 }
 
-TimeSeries.contextType = BrushContext;
+// TimeSeries.contextType = BrushContext;
 
 export default withAxes(TimeSeries);

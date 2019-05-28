@@ -70,6 +70,8 @@ class Scatterplots extends Chart {
           margin.left +
           margin.right} ${height + margin.top + margin.bottom}`}
         preserveAspectRatio="xMinYMin meet"
+        height={height}
+        width={width}
       >
         {this.renderAxis()}
         <g

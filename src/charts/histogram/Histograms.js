@@ -29,17 +29,18 @@ class Histograms extends Chart {
 
     const count = React.Children.count(children)
     const histogramWidth = ((width - margin.left - margin.right) -  defaultMargin.left * count) / count;
-    const histogramHeight = height;
+    // const histogramHeight = height - margin.top - margin.bottom;
+    
     let histData = [];
     let xDomains = [];
     let yDomains = [];
 
     React.Children.map(children, child => {
-        let histProps = bins({...child.props, margin: defaultMargin, width: histogramWidth, height: histogramHeight});
+        let histProps = bins({height, ...child.props, margin: defaultMargin, width: histogramWidth});
         
         xDomains.push(histProps.scale.x.domain());
         yDomains.push(histProps.scale.y.domain());
-        histData.push({...histProps, width: histogramWidth, height: histogramHeight});
+        histData.push({...histProps, width: histogramWidth});
     })
     
 
@@ -78,16 +79,19 @@ class Histograms extends Chart {
           margin.left +
           margin.right} ${height + margin.top + margin.bottom}`}
         preserveAspectRatio="xMinYMin meet"
+        height={height}
+        width={width}
       >
         {this.renderAxis()}
         <g
           className='hist-group'
-          style={transforms}
+          
         >  
         {React.Children.map(children, (child, i) => {
           return (
             <svg className={`hist ${i}`} key={i}
             x={(this.state.histogramWidth+Histograms.defaultMargin.left)*i}
+            y={margin.top + margin.bottom}
             height={height - margin.top - margin.bottom}
             >
               {React.cloneElement(child, {pre: true, margin: Histograms.defaultMargin,...this.state.histograms[i]})}
