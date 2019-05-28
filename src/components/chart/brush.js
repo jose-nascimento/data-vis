@@ -1,4 +1,5 @@
-import { brush } from 'd3-brush';
+import React from 'react';
+import { brush, brushSelection } from 'd3-brush';
 import { select } from 'd3-selection';
 
 // function brushed() {
@@ -23,10 +24,31 @@ function brusher() {
   console.log('brushed');
 }
 
+export function onBrush() {
+  console.log('brushed', this);
+  
+  const selection = brushSelection(this);
+  console.log(selection);  
+}
+
+export function applyBrush(thisArg) {
+  return onBrush.bind(thisArg);
+}
+
+export const BrushContext = React.createContext(null);
+
+export function brushed(node) {
+  const currentNode = select(node);
+  const currentBrush = brush();
+  return function addBrush(event, name, callback) {
+    let typename = event + name? `.${name}` : '';
+    currentNode.call(currentBrush.on('end', callback));
+  }
+}
+
 export function addBrush(node, startPoint, area) {
 
-    const currentBrush = select(node).call(brush().on('brush', brusher));
-    console.log('addBrush', currentBrush);
+    const currentBrush = select(node).call(brush().on('end', onBrush));
     return currentBrush;
     //brush() .on("start brush", brushed);
 

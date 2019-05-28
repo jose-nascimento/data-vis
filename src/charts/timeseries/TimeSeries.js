@@ -4,6 +4,7 @@ import { extent } from 'd3-array';
 import { scaleLinear, scaleTime } from 'd3-scale';
 import { line, curveNatural } from 'd3-shape';
 import { load } from './helpers';
+import { BrushContext, applyBrush } from '../../components/chart/brush';
 
 class TimeSeries extends Chart {
   static defaultProps = {
@@ -27,6 +28,8 @@ class TimeSeries extends Chart {
   constructor(props) {
     super(props);
 
+    this.thisRef = React.createRef();
+
     const { loaded, datapoints, domain, colorScale } = props;
 
     if (loaded) {
@@ -43,6 +46,10 @@ class TimeSeries extends Chart {
       let state = load(this.props)
       this.setState({...state, loaded: true});
     }
+
+    console.log(this.context);    
+
+    this.context('end', 'timeseries', applyBrush(this.thisRef.current));
 
   }
 
@@ -103,7 +110,7 @@ class TimeSeries extends Chart {
         y={this.props.y}
       >
         {this.renderAxis()}
-        <g
+        <g ref={this.thisRef}
           className='path'
           fill={fill}
           stroke={stroke}
@@ -149,5 +156,7 @@ class TimeSeries extends Chart {
   //   // data-y-range-to={ry[1]}
   // }
 }
+
+TimeSeries.contextType = BrushContext;
 
 export default withAxes(TimeSeries);

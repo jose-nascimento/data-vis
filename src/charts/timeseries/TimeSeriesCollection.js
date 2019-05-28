@@ -51,8 +51,8 @@ class TimeSeriesCollection extends Chart {
   render() {
     const { width, height, margin, axisRight, axisBottom, axisLeft, children, ...props } = this.props;
     
-    
     return (
+      
       <svg
         className='TimeSeriesCollection'
         viewBox={`-${margin.left} -${margin.top} ${width +
