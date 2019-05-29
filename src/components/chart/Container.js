@@ -9,7 +9,7 @@ import Scatterplot from '../../charts/scatterplot/Scatterplot';
 import Axis from "../Axis";
 import Scatterplots from '../../charts/scatterplot/Scatterplots';
 import TimeSeriesCollection from '../../charts/timeseries/TimeSeriesCollection';
-import { Brush, ChartBrush, useBrush } from './brush';
+import { Brush, ChartBrush, useBrush, ZoomContext } from './brush';
 import { zoom, zoomTransform } from 'd3-zoom';
 import { select } from 'd3-selection';
 
@@ -23,8 +23,6 @@ const style = {
   fontSize: 0,
   display: 'block',
 };
-
-export const ZoomContext = React.createContext(null);
 
 class Container extends Component {
   static defaultProps = {
@@ -43,8 +41,9 @@ class Container extends Component {
     super(props);
 
     this.groupRef = React.createRef();
+    this.onZoom = this.onZoom.bind(this);
 
-    this.state = {loaded: false, brush: null};
+    this.state = {loaded: false, brush: null, zoom: null};
   }
 
   componentDidMount() {
@@ -58,16 +57,24 @@ class Container extends Component {
 
       if (!this.brush) this.brush =  new Brush(this.groupRef.current);
 
-      let z = zoom().on('zoom', this.zoomed);
+      let z = zoom().on('zoom', this.zoomed(this.onZoom));
       select(this.groupRef.current).call(z);
 
       this.setState({brush: this.brush, cdata: timeseries, cdata2: timeseries2, cdata3: timeseries3, sdata: scatterplot, sdata2: scatterplot2, sdata3: scatterplot3, loaded: true});
     })
   }
 
-  zoomed() {
-    let t = zoomTransform(this);    
-    select(this).attr('transform', `translate(${t.x}, ${t.y}) scale(${t.k})`);
+  onZoom(t) {
+    console.log('called it!', t);
+    this.setState({zoom: t});
+  }
+
+  zoomed(callback) {
+    return function() {
+      let t = zoomTransform(this);
+      select(this).attr('transform', `translate(${t.x}, ${t.y}) scale(${t.k})`);
+      callback(t);
+    }
   }
 
   render() {
@@ -78,6 +85,7 @@ class Container extends Component {
     let spBrush = new useBrush('color', '#00dd00');
     return (
       <figure className='chart-container' id='chart1' style={style}>
+        <ZoomContext.Provider value={this.state.zoom}>
         <ChartBrush.Provider value={this.state.brush}>
         <svg
           xmlns='http://www.w3.org/2000/svg'
@@ -174,6 +182,7 @@ class Container extends Component {
           </g>
         </svg>
         </ChartBrush.Provider>
+        </ZoomContext.Provider>
       </figure>
     );
   }

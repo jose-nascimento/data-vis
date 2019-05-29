@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { axisTop, axisRight, axisBottom, axisLeft } from 'd3-axis';
 import { select } from 'd3-selection';
-import { ZoomContext } from './chart/Container';
+import { ZoomContext } from './chart/brush';
 
 class Axis extends Component {
 
@@ -41,7 +41,32 @@ class Axis extends Component {
     super(props);
 
     this.axisRef = React.createRef();
+
+    this.state = {};
+
   }
+
+  componentDidUpdate() {
+    let transform = this.context;
+    console.log('mudou', transform);
+
+    if (transform) {
+      let axisFn = this.state.axisFn;
+      console.log('prev scale', axisFn().range())
+      if (this.props.axis === 'x') {
+        // axisFn = transform.rescaleX(axisFn);
+        console.log('new scale', axisFn().range())
+        // this.setState({ axisFn });
+      } else {
+        // axisFn = transform.rescaleY(axisFn);
+        console.log('new scale', axisFn.range())
+        // this.setState({ axisFn });
+      }
+
+    }
+  }
+
+
 
 renderAxis(ref, axis) {
 
@@ -51,13 +76,16 @@ renderAxis(ref, axis) {
 
 }
 
+
+
 componentDidMount() {
 
   const { axis: axisScale, ticks, tickFormat } = this.props;
   const scale = (axisScale === 'x')? this.props.scale.x : this.props.scale.y;
   const { axis } = Axis.positionalProps[this.props.position];
-  const axisFn = axis(scale);
-  if (ticks) console.log(ticks, axisFn);  
+  let axisFn = axis(scale);
+  this.setState({ axisFn });
+
   if (ticks) axisFn.ticks(ticks);
   if (tickFormat) axisFn.tickFormat(tickFormat);
 

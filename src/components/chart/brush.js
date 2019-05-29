@@ -23,15 +23,17 @@ import { select, selectAll } from 'd3-selection';
 
 export const ChartBrush = React.createContext(null);
 
+export const ZoomContext = React.createContext(null);
+
 function brusher() {
   console.log('brushed', brushSelection(this));
 }
 
 export function onBrush() {
   console.log('brushed', this);
-  
+
   const selection = brushSelection(this);
-  console.log(selection);  
+  console.log(selection);
 }
 
 export function applyBrush(thisArg) {
@@ -50,7 +52,7 @@ export function brushed(node) {
 }
 
 export function addBrush(node) {
-  console.log('added', node);  
+  console.log('added', node);
   const currentBrush = select(node).call(brush().on('end', onBrush))
   return currentBrush;
   //brush() .on("start brush", brushed);
@@ -76,7 +78,7 @@ export class useBrush {
         throw `Invalid argument for callback, must be string or array, got ${typeof callback}`;
     }
   }
-  
+
   update(node, name, selector) {
     this.node = node;
     this.name = name;
@@ -88,14 +90,14 @@ export class useBrush {
 export class Brush {
 
   // static thisBrush = null;
-  
+
   constructor(node) {
-    
+
     // this.selector = '.points .point, .dots .dot';
     // this.filter = this.xyFilter.bind(this);
     // this.getData = this.getDatum.bind(this);
     // this.fillColor = '#dd0000';
-    
+
     this.getSelection = this.getSelection.bind(this);
     this.getDataset = this.getDataset.bind(this);
     this.getNodes = this.getNodes.bind(this);
@@ -106,13 +108,13 @@ export class Brush {
     this.xFilter = this.xFilter.bind(this);
     this.yFilter = this.yFilter.bind(this);
     this.xyFilter = this.xyFilter.bind(this);
-    
+
     this.node = node;
     this.brush = brush();
     this.brushSelection = this.brush(select(node));
-    
+
     this.initParentScale();
-    
+
   }
 
   // static initBrush(node) {
@@ -181,10 +183,10 @@ export class Brush {
       return (d) => {
         const x = sx(+d.getAttribute('cx'));
         return x >= x0 && x <= x1;
-      };      
+      };
     };
   }
-  
+
   yFilter(context) {
     const thisArg = this;
     const { dataScale } = context;
@@ -196,40 +198,40 @@ export class Brush {
       return (d) => {
         const y = sy(+d.getAttribute('cy'));
         return y >= y0 && y <= y1;
-      };      
+      };
     };
   }
-  
+
   xyFilter(xFilter, yFilter) {
     return function (selection) {
       const [ xf, yf ] = [ xFilter(selection), yFilter(selection) ];
       return(d) => {
         return xf(d) && yf(d);
-      }      
+      }
     };
   }
 
   getDatum(d) {
     return  { ...d.dataset };
   }
-  
+
   getSelection(context) {
     const { node, selector } = context;
     return Array.prototype.slice.call(node.querySelectorAll(selector));
   }
-  
+
   getNodes(context) {
     const { parentNode, filter } = context;
     return this.getSelection(context).filter(filter(brushSelection(parentNode)));
   }
-  
-  getDataset(context) {  
+
+  getDataset(context) {
     const { getData } = context;
     return this.getNodes(context).map(getData);
   }
-  
+
   logger(context) {
-    return () => this.getDataset(context).map(({x, y}) => console.log(`x: ${x}, y: ${y}`));    
+    return () => this.getDataset(context).map(({x, y}) => console.log(`x: ${x}, y: ${y}`));
   }
 
   colorer(context) {
