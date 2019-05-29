@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { axisTop, axisRight, axisBottom, axisLeft } from 'd3-axis';
 import { select } from 'd3-selection';
+import { ZoomContext } from './chart/Container';
 
 class Axis extends Component {
 
@@ -83,5 +84,7 @@ componentDidMount() {
     );
   }
 }
+
+Axis.contextType = ZoomContext;
 
 export default Axis;
