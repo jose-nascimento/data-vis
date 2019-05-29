@@ -65,7 +65,6 @@ class Container extends Component {
   }
 
   onZoom(t) {
-    console.log('called it!', t);
     this.setState({zoom: t});
   }
 
@@ -79,7 +78,7 @@ class Container extends Component {
 
   render() {
     const { width, height, margin, group: Group, ...props } = { ...this.props };
-    const hxAxis = <Axis axis='x' color='black' ticks={4} />;
+    const hxAxis = <Axis axis='x' color='black' />;
     const hyAxis = <Axis axis='y' color='palevioletred' offset='2' tickFormat={t => `${t*(-1)}k`} />;
     let tsBrush = new useBrush('color', '#dd0000');
     let spBrush = new useBrush('color', '#00dd00');

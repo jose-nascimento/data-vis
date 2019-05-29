@@ -58,9 +58,6 @@ class TimeSeries extends Chart {
       this.setState({brush: ctx});
     }
 
-    // select(this.thisRef.current).selectAll('.dots .dot').data(this.state.datapoints);
-    // this.context('end', 'timeseries', applyBrush(this.thisRef.current));
-
   }
 
   getX(d) {

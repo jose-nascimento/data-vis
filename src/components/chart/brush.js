@@ -3,31 +3,9 @@ import { brush, brushSelection } from 'd3-brush';
 import { scaleLinear } from 'd3-scale';
 import { select, selectAll } from 'd3-selection';
 
-// function brushed() {
-//     let s = event.selection,
-//        x0 = s[0][0],
-//        y0 = s[0][1],
-//        x1 = s[1][0],
-//        y1 = s[1][1];
-//
-//     selectAll('circle')
-//         .style("fill", function (d)
-//         {
-//             if (myApp.xScale(d.cx) >= x0 && myApp.xScale(d.cx) <= x1 &&
-//                 myApp.yScale(d.cy) >= y0 && myApp.yScale(d.cy) <= y1)
-//             { return "#ec7014"; }
-//             else
-//             { return "rgb(150,150,190)"; }
-//         });
-// }
-
 export const ChartBrush = React.createContext(null);
 
 export const ZoomContext = React.createContext(null);
-
-function brusher() {
-  console.log('brushed', brushSelection(this));
-}
 
 export function onBrush() {
   console.log('brushed', this);
@@ -51,23 +29,10 @@ export function brushed(node) {
   }
 }
 
-export function addBrush(node) {
-  console.log('added', node);
-  const currentBrush = select(node).call(brush().on('end', onBrush))
-  return currentBrush;
-  //brush() .on("start brush", brushed);
-  // svg.append("g")
-  //     .attr("class", "brush")
-  //     .call(myApp.brush);
-}
-
 export class useBrush {
 
   constructor(callback = 'set', color = 'black') {
-    // this.node = node;
-    // this.name = name;
     this.color = color;
-    // this.selector = selector;
     switch(typeof callback) {
       case('string'):
         this.callbackName = callback;
@@ -89,14 +54,7 @@ export class useBrush {
 
 export class Brush {
 
-  // static thisBrush = null;
-
   constructor(node) {
-
-    // this.selector = '.points .point, .dots .dot';
-    // this.filter = this.xyFilter.bind(this);
-    // this.getData = this.getDatum.bind(this);
-    // this.fillColor = '#dd0000';
 
     this.getSelection = this.getSelection.bind(this);
     this.getDataset = this.getDataset.bind(this);
@@ -116,17 +74,6 @@ export class Brush {
     this.initParentScale();
 
   }
-
-  // static initBrush(node) {
-
-  //   if (!Brush.thisBrush) {
-  //     Brush.thisBrush = new Brush(node);
-  //     return Brush.thisBrush;
-  //   } else {
-  //     return Brush.thisBrush;
-  //   }
-
-  // }
 
   bindBrush(context) {
 

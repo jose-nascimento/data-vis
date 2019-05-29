@@ -47,23 +47,7 @@ class Axis extends Component {
   }
 
   componentDidUpdate() {
-    let transform = this.context;
-    console.log('mudou', transform);
-
-    if (transform) {
-      let axisFn = this.state.axisFn;
-      console.log('prev scale', axisFn().range())
-      if (this.props.axis === 'x') {
-        // axisFn = transform.rescaleX(axisFn);
-        console.log('new scale', axisFn().range())
-        // this.setState({ axisFn });
-      } else {
-        // axisFn = transform.rescaleY(axisFn);
-        console.log('new scale', axisFn.range())
-        // this.setState({ axisFn });
-      }
-
-    }
+    this.drawAxis();
   }
 
 
@@ -76,6 +60,30 @@ renderAxis(ref, axis) {
 
 }
 
+drawAxis() {
+
+  let transform = this.context;
+  let axisFn = this.state.axisFn;
+  let scale = this.props.scale;
+
+  if (transform) {
+    let newScale;
+    if (this.props.axis === 'x') {
+      newScale = transform.rescaleX(scale.x);
+    } else {
+      newScale = transform.rescaleY(scale.y);
+    }
+    
+    axisFn.scale(newScale);
+  }
+
+
+
+  let renderer = this.renderAxis(this.axisRef, axisFn)
+  setTimeout(() => window.requestAnimationFrame(renderer), 0);
+
+}
+
 
 
 componentDidMount() {
@@ -84,14 +92,12 @@ componentDidMount() {
   const scale = (axisScale === 'x')? this.props.scale.x : this.props.scale.y;
   const { axis } = Axis.positionalProps[this.props.position];
   let axisFn = axis(scale);
-  this.setState({ axisFn });
-
+  
   if (ticks) axisFn.ticks(ticks);
   if (tickFormat) axisFn.tickFormat(tickFormat);
+  
+  this.setState({ axisFn });
 
-
-  let renderer = this.renderAxis(this.axisRef, axisFn)
-  setTimeout(() => window.requestAnimationFrame(renderer), 0);
   }
 
   render() {
