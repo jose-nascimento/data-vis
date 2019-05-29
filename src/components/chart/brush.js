@@ -107,10 +107,6 @@ export class Brush {
           break;
       }
     }
-
-    // this.brush.on(`end.${name}_log`, this.logger(context));
-    // this.brush.on(`end.${name}_color`, this.colorer(context));
-
   }
 
   setter(context) {
