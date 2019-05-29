@@ -3,10 +3,15 @@ import { histogram, max, extent } from 'd3-array';
 import { scaleLinear } from 'd3-scale';
 
 export function Bar(props) {
-  const { d, scale, height, ...rest } = props;
+  const { d, scale, height, label, style, ...rest } = props;
    
   return (
     <g className='bar'>
+        {label && 
+          <text y={scale.y(d.length + 3)} x={scale.x(d.x0)} style={style}>
+            {label(d)}
+          </text>
+        }
         <rect
         x={`${scale.x(d.x0)}`}
         y={`${scale.y(d.length)}`}

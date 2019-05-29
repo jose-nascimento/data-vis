@@ -59,12 +59,28 @@ export function addBrush(node) {
   //     .call(myApp.brush);
 }
 
-export class testBrush {
+export class useBrush {
 
-  constructor(node) {
+  constructor(callback = 'set', color = 'black') {
+    // this.node = node;
+    // this.name = name;
+    this.color = color;
+    // this.selector = selector;
+    switch(typeof callback) {
+      case('string'):
+        this.callbackName = callback;
+      case('object'):
+        this.callback = Array.isArray(callback)? callback : null;
+        break;
+      default:
+        throw `Invalid argument for callback, must be string or array, got ${typeof callback}`;
+    }
+  }
+  
+  update(node, name, selector) {
     this.node = node;
-    this.color = '#dd0000';
-    this.selector = '.points .point';
+    this.name = name;
+    this.selector = selector;
   }
 
 }
@@ -122,26 +138,43 @@ export class Brush {
 
     context.filter = this.xyFilter(this.xFilter(context), this.yFilter(context));
 
-    this.brush.on('end.log', this.logger(context));
-    this.brush.on('end.color', this.colorer(context));
+    let name = context.name;
+
+    if (context.callback) {
+      let callback = context.callback;
+      this.brush.on(`${callback[0]}.${name}_${callback[2]? callback[2] : 'default'}`, callback[1]);
+    }
+    if (context.callbackName) {
+      switch (context.callbackName) {
+        case 'log':
+          this.brush.on(`end.${name}_log`, this.logger(context));
+          break;
+        case 'color':
+          this.brush.on(`end.${name}_color`, this.colorer(context));
+          break;
+        case 'set':
+          this.brush.on(`end.${name}_color`, this.setter(context));
+        default:
+          break;
+      }
+    }
+
+    // this.brush.on(`end.${name}_log`, this.logger(context));
+    // this.brush.on(`end.${name}_color`, this.colorer(context));
 
   }
 
   setter(context) {
-    return (data) => {
-      context.data = data;
+    return () => {
+      context.data = context.parent.getDataset();
     };
-  }
-
-  getter(context) {
-    return () => context.data;
   }
 
   xFilter(context) {
     const thisArg = this;
     const { dataScale } = context;
     return function(selection) {
-      let [ [x0], [x1] ] = selection || [[0, 0], [200, 200]];
+      let [ [x0], [x1] ] = selection || [[0, 0], [0, 0]];
       thisArg.rescale(context);
       [x0, x1] = [ thisArg.parentScale.x(x0), thisArg.parentScale.x(x1) ];
       let sx = dataScale.x;
@@ -156,7 +189,7 @@ export class Brush {
     const thisArg = this;
     const { dataScale } = context;
     return function(selection) {
-      let [ [, y0], [, y1] ] = selection || [[0, 0], [200, 200]];
+      let [ [, y0], [, y1] ] = selection || [[0, 0], [0, 0]];
       thisArg.rescale(context);
       [y0, y1] = [ thisArg.parentScale.y(y0), thisArg.parentScale.y(y1) ];
       let sy = dataScale.y;

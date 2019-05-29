@@ -56,6 +56,7 @@ componentDidMount() {
   const scale = (axisScale === 'x')? this.props.scale.x : this.props.scale.y;
   const { axis } = Axis.positionalProps[this.props.position];
   const axisFn = axis(scale);
+  if (ticks) console.log(ticks, axisFn);  
   if (ticks) axisFn.ticks(ticks);
   if (tickFormat) axisFn.tickFormat(tickFormat);
 

@@ -3,7 +3,7 @@ import Chart, { withAxes } from '../Chart';
 import { select, selectAll } from 'd3-selection';
 import { line, curveNatural } from 'd3-shape';
 import { load } from './helpers';
-import { applyBrush } from '../../components/chart/brush';
+import { ChartBrush } from '../../components/chart/brush';
 
 class TimeSeries extends Chart {
   static defaultProps = {
@@ -26,7 +26,6 @@ class TimeSeries extends Chart {
 
   constructor(props) {
     super(props);
-
     this.thisRef = React.createRef();
 
     const { loaded, datapoints, domain, colorScale } = props;
@@ -41,12 +40,25 @@ class TimeSeries extends Chart {
 
   componentDidMount() {
 
+    const { name } = this.props;
+
     if (this.state && !this.state.loaded) {
       let state = load(this.props)
       this.setState({...state, loaded: true});
-    } 
+    }
 
-    select(this.thisRef.current).selectAll('.dots .dot').data(this.state.datapoints);
+    const chartBrush = this.context;
+
+    if (chartBrush && this.state && this.state.loaded && this.props.brush) {
+
+      let ctx = this.props.brush;
+      ctx.update(this.thisRef.current, name? name : 'timeseries', `${name? ('.name-' + name + ' ') : ''}.dots .dot`);
+  
+      chartBrush.bindBrush(ctx);
+      this.setState({brush: ctx});
+    }
+
+    // select(this.thisRef.current).selectAll('.dots .dot').data(this.state.datapoints);
     // this.context('end', 'timeseries', applyBrush(this.thisRef.current));
 
   }
@@ -67,6 +79,7 @@ class TimeSeries extends Chart {
       height,
       margin,
       data,
+      name,
       fill,
       stroke,
       strokeLinejoin,
@@ -83,6 +96,7 @@ class TimeSeries extends Chart {
       loaded,
       datapoints: plot,
       domain,
+      textStyle,
       ...props
     } = this.props;
     const datapoints = this.state.datapoints;
@@ -99,7 +113,7 @@ class TimeSeries extends Chart {
 
     return (
       <svg
-        className='Timeseries'
+        className={`Timeseries  name-${name}`}
         viewBox={`-${margin.left} -${margin.top} ${width +
           margin.left +
           margin.right} ${height + margin.top + margin.bottom}`}
@@ -157,6 +171,6 @@ class TimeSeries extends Chart {
   // }
 }
 
-// TimeSeries.contextType = BrushContext;
+TimeSeries.contextType = ChartBrush;
 
 export default withAxes(TimeSeries);

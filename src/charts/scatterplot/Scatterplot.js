@@ -2,6 +2,7 @@ import React from 'react';
 import Chart, { withAxes } from '../Chart';
 import { extent } from 'd3-array';
 import { load } from "./helpers";
+import { ChartBrush } from '../../components/chart/brush';
 
 class Scatterplot extends Chart {
   static defaultProps = {
@@ -14,6 +15,7 @@ class Scatterplot extends Chart {
 
   constructor(props) {
     super(props);
+    this.thisRef = React.createRef();
 
     const { loaded, datapoints, domain, colorScale } = props;
 
@@ -31,6 +33,19 @@ class Scatterplot extends Chart {
       
       let state = load(this.props)
       this.setState({...state, loaded: true});
+    }
+
+    const { name } = this.props;
+
+    const chartBrush = this.context;
+
+    if (chartBrush && this.state && this.state.loaded && this.props.brush) {
+
+      let ctx = this.props.brush;
+      ctx.update(this.thisRef.current, name? name : 'scatterplot', `${name? ('.name-' + name + ' ') : ''}.points .point`);
+  
+      chartBrush.bindBrush(ctx);
+      this.setState({brush: ctx});
     }
 
   }
@@ -55,6 +70,7 @@ class Scatterplot extends Chart {
       height,
       margin,
       data,
+      name,
       r,
       fill,
       stroke,
@@ -72,6 +88,8 @@ class Scatterplot extends Chart {
       datapoints: plot,
       domain,
       colorScale: cs,
+      label,
+      textStyle,
       ...props
     } = this.props;
     const datapoints = this.state.datapoints;
@@ -80,7 +98,7 @@ class Scatterplot extends Chart {
     // const { x: rx, y: ry } = this.state.range;
     return (
       <svg
-        className='Scatterplot'
+        className={`Scatterplot name-${name}`}
         viewBox={`-${margin.left} -${margin.top} ${width +
           margin.left +
           margin.right} ${height + margin.top + margin.bottom}`}
@@ -101,13 +119,19 @@ class Scatterplot extends Chart {
           data-y-domain-from={dy[0]}
           data-y-domain-to={dy[1]}
           {...props}
+          ref={this.thisRef}
         >
           <circle className='marker x0-marker y0-marker' cx='0' cy='0' r='1' fill='none' stroke='none' strokeWidth='0' data-x={dx[0]} data-y={dy[0]} />
           {data.map((d, i) => {
             let fillColor = colorScale? this.getColor(d) : undefined;
             return (
+              <g key={i}>
+              {label && 
+                <text y={datapoints[i].y - 2} x={datapoints[i].y} style={textStyle}>
+                  {label(d)}
+                </text>
+              }
               <circle
-                key={i}
                 className='point'
                 cx={datapoints[i].x}
                 cy={datapoints[i].y}
@@ -116,6 +140,7 @@ class Scatterplot extends Chart {
                 data-x={selectX(d)}
                 data-y={selectY(d)}
               />
+              </g>
             );
           })}
           <circle className='marker x1-marker y1-marker' cx={width} cy={height} r='1' fill='none' stroke='none' strokeWidth='0' data-x={dx[1]} data-y={dy[1]} />
@@ -124,5 +149,7 @@ class Scatterplot extends Chart {
     );
   }
 }
+
+Scatterplot.contextType = ChartBrush;
 
 export default withAxes(Scatterplot);

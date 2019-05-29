@@ -68,6 +68,10 @@ class Chart extends Component {
     strokeLinejoin: 'miter',
     strokeLinecap: 'butt',
     strokeWidth: '0',
+    textStyle: {
+      fontSize: 10,
+      color: 'black',
+    },
   };
 
   renderAxis() {

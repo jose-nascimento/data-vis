@@ -6,6 +6,11 @@ import { Bar, bins } from './helpers';
 
 class Histogram extends Chart {
 
+  static defaultTextProps = {
+    fontSize: 10,
+    color: 'black',
+  }
+
   constructor(props) {
     super(props);
 
@@ -20,12 +25,12 @@ class Histogram extends Chart {
   }
 
   render() {
-    const { width, height, margin, fill, stroke, strokeLinejoin, strokeLinecap, strokeWidth, pre, nice, axisTop, axisRight, axisBottom, axisLeft, ...props } = this.props;
+    const { width, height, margin, name, label, fill, stroke, strokeLinejoin, strokeLinecap, strokeWidth, pre, nice, axisTop, axisRight, axisBottom, axisLeft, textStyle, ...props } = this.props;
     
     
     return (
       <svg
-        className='Histogram'
+        className={`Histogram name-${name}`}
         viewBox={`-${margin.left} -${margin.top} ${width +
           margin.left +
           margin.right} ${height + margin.top + margin.bottom}`}
@@ -43,7 +48,7 @@ class Histogram extends Chart {
         >
           {this.state.histogram.map((d, i) => {
             return (
-              <Bar key={i} d={d} height={height} scale={this.state.scale} />
+              <Bar key={i} d={d} height={height} label={label} scale={this.state.scale} style={textStyle} />
             );
           })}
         </g>

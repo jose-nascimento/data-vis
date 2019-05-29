@@ -9,7 +9,9 @@ import Scatterplot from '../../charts/scatterplot/Scatterplot';
 import Axis from "../Axis";
 import Scatterplots from '../../charts/scatterplot/Scatterplots';
 import TimeSeriesCollection from '../../charts/timeseries/TimeSeriesCollection';
-import { Brush, ChartBrush } from './brush';
+import { Brush, ChartBrush, useBrush } from './brush';
+import { zoom, zoomTransform } from 'd3-zoom';
+import { select } from 'd3-selection';
 
 const style = {
   color: '#EEE',
@@ -48,26 +50,30 @@ class Container extends Component {
       const timeseries = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: +data[i].x}));
       const timeseries2 = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: +data[i].y}));
       const timeseries3 = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: +data[i].z}));
-      const scatterplot = data.slice(0, 100).map((d, i) => ({x: +d.y, y: +d.z, c: +d.x}));
+      const scatterplot = data.slice(0, 100).map((d, i) => ({x: +d.y, y: +d.z, c: +d.x, label: d.t}));
       const scatterplot2 = data.slice(0, 100).map((d, i) => ({x: +d.x, y: +d.y, c: +d.z}));
       const scatterplot3 = data.slice(0, 100).map((d, i) => ({x: +d.z, y: +d.x, c: +d.y}));
 
-      //const brush = brushed(this.groupRef.current, [0, 0], [this.props.width, this.props.height]);
       if (!this.brush) this.brush =  new Brush(this.groupRef.current);
 
+      let z = zoom().on('zoom', this.zoomed);
+      select(this.groupRef.current).call(z);
+
       this.setState({brush: this.brush, cdata: timeseries, cdata2: timeseries2, cdata3: timeseries3, sdata: scatterplot, sdata2: scatterplot2, sdata3: scatterplot3, loaded: true});
-
-      // setTimeout(() => new Brush(this.groupRef.current), 100)
-
-      console.log(this.groupRef);
-
     })
+  }
+
+  zoomed() {
+    let t = zoomTransform(this);    
+    select(this).attr('transform', `translate(${t.x}, ${t.y}) scale(${t.k})`);
   }
 
   render() {
     const { width, height, margin, group: Group, ...props } = { ...this.props };
-    const hxAxis = <Axis axis='x' color='black'/>;
+    const hxAxis = <Axis axis='x' color='black' ticks={4} />;
     const hyAxis = <Axis axis='y' color='palevioletred' offset='2' tickFormat={t => `${t*(-1)}k`} />;
+    let tsBrush = new useBrush('color', '#dd0000');
+    let spBrush = new useBrush('color', '#00dd00');
     return (
       <figure className='chart-container' id='chart1' style={style}>
         <ChartBrush.Provider value={this.state.brush}>
@@ -83,13 +89,13 @@ class Container extends Component {
           <g className='chart-groups' ref={this.groupRef}>
             {this.state.loaded ? (
               <TimeSeriesCollection
-                axisBottom={hxAxis}
-                axisLeft={hyAxis}
                 width={600}
                 height={600}
               >
                 <TimeSeries
                   data={this.state.cdata}
+                  name='blue'
+                  brush={tsBrush}
                   selectX={d => d.t}
                   selectY={d => d.x}
                   strokeWidth={4}
@@ -119,7 +125,7 @@ class Container extends Component {
             ) : null}
 
             <Histograms width={600} height={600}>
-              <Histogram data={data} nice />
+              <Histogram data={data} label={d => `${d.length}`} nice />
               <Histogram data={data} nice />
               <Histogram data={data} nice />
               <Histogram data={data} nice />
@@ -131,9 +137,14 @@ class Container extends Component {
                 margin={{ top: 20, right: 42, bottom: 20, left: 30 }}
                 width={600}
                 height={600}
+                axisBottom={hxAxis}
+                axisLeft={hyAxis}
               >
                 <Scatterplot
                   data={this.state.sdata}
+                  label={d => `${d.label}`}
+                  name='green'
+                  brush={spBrush}
                   selectX={d => d.x}
                   selectY={d => d.y}
                   selectColor={d => d.c}

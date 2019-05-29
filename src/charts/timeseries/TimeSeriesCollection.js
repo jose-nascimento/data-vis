@@ -3,7 +3,7 @@ import Chart, { withAxes } from '../Chart';
 import { max, min } from 'd3-array';
 import { scaleLinear } from 'd3-scale';
 import { load } from './helpers';
-import { ChartBrush } from '../../components/chart/brush';
+import { ChartBrush, useBrush } from '../../components/chart/brush';
 
 class TimeSeriesCollection extends Chart {
 
@@ -52,13 +52,11 @@ class TimeSeriesCollection extends Chart {
   }
 
   componentDidMount() {
+    // const chartBrush = this.context;
 
-    const chartBrush = this.context;
+    // let ctx = new useBrush(this.thisRef.current, 'timeseriesx', '.dots .dot', 'color', '#dd0000');
 
-    let ctx = {node: this.thisRef.current, selector: '.dots .dot', color: '#dd0000'};
-
-    chartBrush.bindBrush(ctx);
-
+    // chartBrush.bindBrush(ctx);
   }
 
   render() {

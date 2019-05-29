@@ -3,6 +3,7 @@ import Chart, { withAxes } from '../Chart';
 import { max, min } from 'd3-array';
 import { scaleLinear } from 'd3-scale';
 import { load } from './helpers';
+import { ChartBrush, useBrush } from '../../components/chart/brush';
 
 class Scatterplots extends Chart {
 
@@ -15,6 +16,7 @@ class Scatterplots extends Chart {
 
   constructor(props) {
     super(props);
+    this.thisRef = React.createRef();
 
     const defaultMargin = Scatterplots.defaultMargin;
     const { children, height, width, margin } = props;
@@ -52,6 +54,14 @@ class Scatterplots extends Chart {
 
   }
 
+  componentDidMount() {
+    // const chartBrush = this.context;
+
+    // let ctx = new useBrush(this.thisRef.current, 'scatterplots', '.points .point', 'color', '#00dd00');
+
+    // chartBrush.bindBrush(ctx);
+  }
+
   render() {
     const { width, height, margin, axisRight, axisBottom, axisLeft, children, ...props } = this.props;
 
@@ -72,6 +82,7 @@ class Scatterplots extends Chart {
         preserveAspectRatio="xMinYMin meet"
         height={height}
         width={width}
+        ref={this.thisRef}
       >
         {this.renderAxis()}
         <g
@@ -89,5 +100,7 @@ class Scatterplots extends Chart {
     );
   }
 }
+
+Scatterplots.contextType = ChartBrush;
 
 export default withAxes(Scatterplots);
