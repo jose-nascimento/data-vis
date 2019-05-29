@@ -1,7 +1,6 @@
 import React from 'react';
 import Chart, { withAxes } from '../Chart';
-import { extent } from 'd3-array';
-import { scaleLinear, scaleTime } from 'd3-scale';
+import { select, selectAll } from 'd3-selection';
 import { line, curveNatural } from 'd3-shape';
 import { load } from './helpers';
 import { applyBrush } from '../../components/chart/brush';
@@ -47,6 +46,7 @@ class TimeSeries extends Chart {
       this.setState({...state, loaded: true});
     } 
 
+    select(this.thisRef.current).selectAll('.dots .dot').data(this.state.datapoints);
     // this.context('end', 'timeseries', applyBrush(this.thisRef.current));
 
   }
@@ -123,6 +123,7 @@ class TimeSeries extends Chart {
         >
           <path d={linePath} />
           <g className='dots' {...dotStyle}>
+            <circle className='marker x0-marker y0-marker' cx='0' cy='0' r='1' fill='none' stroke='none' strokeWidth='0' data-x={dx[0]} data-y={dy[0]} />
             {data.map((d, i) => {
               return (
                 <circle
@@ -136,6 +137,7 @@ class TimeSeries extends Chart {
                 />
               );
             })}
+            <circle className='marker x1-marker y1-marker' cx={width} cy={height} r='1' fill='none' stroke='none' strokeWidth='0' data-x={dx[1]} data-y={dy[1]} />
           </g>
         </g>
       </svg>

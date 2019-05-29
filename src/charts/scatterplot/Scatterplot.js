@@ -102,6 +102,7 @@ class Scatterplot extends Chart {
           data-y-domain-to={dy[1]}
           {...props}
         >
+          <circle className='marker x0-marker y0-marker' cx='0' cy='0' r='1' fill='none' stroke='none' strokeWidth='0' data-x={dx[0]} data-y={dy[0]} />
           {data.map((d, i) => {
             let fillColor = colorScale? this.getColor(d) : undefined;
             return (
@@ -117,6 +118,7 @@ class Scatterplot extends Chart {
               />
             );
           })}
+          <circle className='marker x1-marker y1-marker' cx={width} cy={height} r='1' fill='none' stroke='none' strokeWidth='0' data-x={dx[1]} data-y={dy[1]} />
         </g>
       </svg>
     );

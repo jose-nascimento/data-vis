@@ -1,5 +1,6 @@
 import React from 'react';
 import { brush, brushSelection } from 'd3-brush';
+import { scaleLinear } from 'd3-scale';
 import { select, selectAll } from 'd3-selection';
 
 // function brushed() {
@@ -19,6 +20,8 @@ import { select, selectAll } from 'd3-selection';
 //             { return "rgb(150,150,190)"; }
 //         });
 // }
+
+export const ChartBrush = React.createContext(null);
 
 function brusher() {
   console.log('brushed', brushSelection(this));
@@ -56,48 +59,215 @@ export function addBrush(node) {
   //     .call(myApp.brush);
 }
 
+export class testBrush {
+
+  constructor(node) {
+    this.node = node;
+    this.color = '#dd0000';
+    this.selector = '.points .point';
+  }
+
+}
+
 export class Brush {
 
-  tsFilter([ [x0, y0], [x1, y1] ]) {
-    return (d) => {
-      const [ x, y ] = [(+d.getAttribute('cx')), (+d.getAttribute('cy'))];
-      if (Math.random() < 0.1) console.log(x, y);      
-      return x >= x0 && x <= x1 && y >= y0 && y <= y1;
+  // static thisBrush = null;
+  
+  constructor(node) {
+    
+    // this.selector = '.points .point, .dots .dot';
+    // this.filter = this.xyFilter.bind(this);
+    // this.getData = this.getDatum.bind(this);
+    // this.fillColor = '#dd0000';
+    
+    this.getSelection = this.getSelection.bind(this);
+    this.getDataset = this.getDataset.bind(this);
+    this.getNodes = this.getNodes.bind(this);
+    this.logger = this.logger.bind(this);
+    this.colorer = this.colorer.bind(this);
+    this.bindBrush = this.bindBrush.bind(this);
+
+    this.xFilter = this.xFilter.bind(this);
+    this.yFilter = this.yFilter.bind(this);
+    this.xyFilter = this.xyFilter.bind(this);
+    
+    this.node = node;
+    this.brush = brush();
+    this.brushSelection = this.brush(select(node));
+    
+    this.initParentScale();
+    
+  }
+
+  // static initBrush(node) {
+
+  //   if (!Brush.thisBrush) {
+  //     Brush.thisBrush = new Brush(node);
+  //     return Brush.thisBrush;
+  //   } else {
+  //     return Brush.thisBrush;
+  //   }
+
+  // }
+
+  bindBrush(context) {
+
+    context.parent = this;
+    context.parentNode = this.node;
+    context.start = context.node.querySelector('.marker.x0-marker');
+    context.end = context.node.querySelector('.marker.x1-marker');
+    context.getData = this.getDatum;
+
+    this.initDataScale(context);
+
+    context.filter = this.xyFilter(this.xFilter(context), this.yFilter(context));
+
+    this.brush.on('end.log', this.logger(context));
+    this.brush.on('end.color', this.colorer(context));
+
+  }
+
+  setter(context) {
+    return (data) => {
+      context.data = data;
     };
   }
 
-  tsData(d) {
+  getter(context) {
+    return () => context.data;
+  }
+
+  xFilter(context) {
+    const thisArg = this;
+    const { dataScale } = context;
+    return function(selection) {
+      let [ [x0], [x1] ] = selection || [[0, 0], [200, 200]];
+      thisArg.rescale(context);
+      [x0, x1] = [ thisArg.parentScale.x(x0), thisArg.parentScale.x(x1) ];
+      let sx = dataScale.x;
+      return (d) => {
+        const x = sx(+d.getAttribute('cx'));
+        return x >= x0 && x <= x1;
+      };      
+    };
+  }
+  
+  yFilter(context) {
+    const thisArg = this;
+    const { dataScale } = context;
+    return function(selection) {
+      let [ [, y0], [, y1] ] = selection || [[0, 0], [200, 200]];
+      thisArg.rescale(context);
+      [y0, y1] = [ thisArg.parentScale.y(y0), thisArg.parentScale.y(y1) ];
+      let sy = dataScale.y;
+      return (d) => {
+        const y = sy(+d.getAttribute('cy'));
+        return y >= y0 && y <= y1;
+      };      
+    };
+  }
+  
+  xyFilter(xFilter, yFilter) {
+    return function (selection) {
+      const [ xf, yf ] = [ xFilter(selection), yFilter(selection) ];
+      return(d) => {
+        return xf(d) && yf(d);
+      }      
+    };
+  }
+
+  getDatum(d) {
     return  { ...d.dataset };
   }
-
-  getSelection() {
-    return Array.prototype.slice.call(this.node.querySelectorAll(this.selector));
+  
+  getSelection(context) {
+    const { node, selector } = context;
+    return Array.prototype.slice.call(node.querySelectorAll(selector));
+  }
+  
+  getNodes(context) {
+    const { parentNode, filter } = context;
+    return this.getSelection(context).filter(filter(brushSelection(parentNode)));
+  }
+  
+  getDataset(context) {  
+    const { getData } = context;
+    return this.getNodes(context).map(getData);
+  }
+  
+  logger(context) {
+    return () => this.getDataset(context).map(({x, y}) => console.log(`x: ${x}, y: ${y}`));    
   }
 
-  log() {
-    console.log(this.node);    
-    const { sx, sy } = this.scale;
-    let selection = brushSelection(this.node);
-    console.log(selection);    
-    let a = this.getSelection()
-    console.log(a);
-    let b = a.filter(this.filter(selection));
-    let c = b.map(this.getData)
-    console.log(c);    
-    c.map(({x, y}) => console.log(`x: ${x}, y: ${y}`));
+  colorer(context) {
+    const { color } = context;
+    return () => this.getNodes(context).map(d => d.setAttribute('fill', color))
   }
-  constructor(node, scale) {
-    this.selector = '.dots .dot';
-    this.filter = this.tsFilter.bind(this);
-    this.getData = this.tsData.bind(this);
-    this.scale = scale;
-    this.node = node;
+
+  dataScaleX(context) {
+    const { start, end } = context;
+    let [x0, x1] = [ (+start.getAttribute('cx')), (+end.getAttribute('cx')) ];
+
+    let { left } = start.getBoundingClientRect();
+    let { right } = end.getBoundingClientRect();
+
+    context.dataScale.x.domain([x0, x1]).range([left, right]);
+  }
+
+  dataScaleY(context) {
+    const { start, end } = context;
+    let [y0, y1] = [ (+start.getAttribute('cy')), (+end.getAttribute('cy')) ];
+
+    let { top } = start.getBoundingClientRect();
+    let { bottom } = end.getBoundingClientRect();
+
+    context.dataScale.y.domain([y0, y1]).range([top, bottom]);
+  }
+
+  initDataScale(context) {
+
+    let sx = scaleLinear();
+    let sy = scaleLinear();
+
+    context.dataScale = {x: sx, y: sy};
+
+    this.dataScaleX(context);
+    this.dataScaleY(context);
+
+  }
+
+  parentScaleX() {
+    let [ [x0], [x1] ] = this.node.__brush.extent;;
+
+    let { left, right } = this.node.getBoundingClientRect();
+
+    this.parentScale.x.domain([x0, x1]).range([left, right]);
+  }
+
+  parentScaleY() {
+    let [ [, y0], [, y1] ] = this.node.__brush.extent;;
+
+    let { top, bottom } = this.node.getBoundingClientRect();
+
+    this.parentScale.y.domain([y0, y1]).range([top, bottom]);
+  }
 
 
+  initParentScale() {
 
-    console.log(this.scale);    
+    let sx = scaleLinear();
+    let sy = scaleLinear();
 
-    this.brush = select(node).call(brush().on('end', this.log.bind(this)));
+    this.parentScale = {x: sx, y: sy};
+
+    this.parentScaleX();
+    this.parentScaleY();
+
+  }
+
+  rescale(context) {
+    this.initDataScale(context);
+    this.initParentScale();
   }
 
 }

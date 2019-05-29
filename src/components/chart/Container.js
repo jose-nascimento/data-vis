@@ -9,7 +9,7 @@ import Scatterplot from '../../charts/scatterplot/Scatterplot';
 import Axis from "../Axis";
 import Scatterplots from '../../charts/scatterplot/Scatterplots';
 import TimeSeriesCollection from '../../charts/timeseries/TimeSeriesCollection';
-import { brushed } from './brush';
+import { Brush, ChartBrush } from './brush';
 
 const style = {
   color: '#EEE',
@@ -53,8 +53,11 @@ class Container extends Component {
       const scatterplot3 = data.slice(0, 100).map((d, i) => ({x: +d.z, y: +d.x, c: +d.y}));
 
       //const brush = brushed(this.groupRef.current, [0, 0], [this.props.width, this.props.height]);
+      if (!this.brush) this.brush =  new Brush(this.groupRef.current);
 
-      this.setState({cdata: timeseries, cdata2: timeseries2, cdata3: timeseries3, sdata: scatterplot, sdata2: scatterplot2, sdata3: scatterplot3, loaded: true});
+      this.setState({brush: this.brush, cdata: timeseries, cdata2: timeseries2, cdata3: timeseries3, sdata: scatterplot, sdata2: scatterplot2, sdata3: scatterplot3, loaded: true});
+
+      // setTimeout(() => new Brush(this.groupRef.current), 100)
 
       console.log(this.groupRef);
 
@@ -67,6 +70,7 @@ class Container extends Component {
     const hyAxis = <Axis axis='y' color='palevioletred' offset='2' tickFormat={t => `${t*(-1)}k`} />;
     return (
       <figure className='chart-container' id='chart1' style={style}>
+        <ChartBrush.Provider value={this.state.brush}>
         <svg
           xmlns='http://www.w3.org/2000/svg'
           xmlnsXlink='http://www.w3.org/1999/xlink'
@@ -74,7 +78,7 @@ class Container extends Component {
             margin.left +
             margin.right} ${height + margin.top + margin.bottom}`}
           preserveAspectRatio='xMinYMax meet'
-          style={{ maxHeight: '75vh' }}
+          style={{ maxHeight: '75vh', fontSize: '0' }}
         >
           <g className='chart-groups' ref={this.groupRef}>
             {this.state.loaded ? (
@@ -156,6 +160,7 @@ class Container extends Component {
             ) : null}
           </g>
         </svg>
+        </ChartBrush.Provider>
       </figure>
     );
   }
