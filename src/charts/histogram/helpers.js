@@ -3,20 +3,22 @@ import { histogram, max, extent } from 'd3-array';
 import { scaleLinear } from 'd3-scale';
 
 export function Bar(props) {
-  const { d, scale, height, label, style, ...rest } = props;
+  const { d, scale, height, label, style, i, ...rest } = props;
    
   return (
     <g className='bar'>
         {label && 
-          <text y={scale.y(d.length + 3)} x={scale.x(d.x0)} style={style}>
-            {label(d)}
+          <text y={scale.y(d.length + 1)} x={scale.x(d.x0)} style={style}>
+            {label(d, i)}
           </text>
         }
         <rect
+        className='bin'
         x={`${scale.x(d.x0)}`}
         y={`${scale.y(d.length)}`}
         width={`${scale.x(d.x1) - scale.x(d.x0) - 1}`}
         height={`${height - scale.y(d.length)}`}
+        data-values={d.map(di => `${di}`).join(' ')}
         {...rest}
         />
     </g>

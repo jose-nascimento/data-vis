@@ -47,12 +47,12 @@ class TimeSeries extends Chart {
       this.setState({...state, loaded: true});
     }
 
-    const chartBrush = this.context;
+    const chartBrush = this.context;   
 
     if (chartBrush && this.state && this.state.loaded && this.props.brush) {
 
       let ctx = this.props.brush;
-      ctx.update(this.thisRef.current, name? name : 'timeseries', `${name? ('.name-' + name + ' ') : ''}.dots .dot`);
+      ctx.update(this.thisRef.current, name? name : 'timeseries', `${name? ('.name-' + name + ' ') : ''}.dots .dot`, 'cx', 'cy');
   
       chartBrush.bindBrush(ctx);
       this.setState({brush: ctx});
@@ -99,7 +99,6 @@ class TimeSeries extends Chart {
     const datapoints = this.state.datapoints;
     const { x: dx, y: dy } = this.state.domain;
     const { r, ...dotStyle } = { ...dotProps, ...dots };
-    // const { x: rx, y: ry } = this.state.range;
     
 
     const l1 = line()
@@ -133,8 +132,8 @@ class TimeSeries extends Chart {
           {...props}
         >
           <path d={linePath} />
+          <circle className='marker x0-marker y0-marker' cx='0' cy='0' r='1' fill='none' stroke='none' strokeWidth='0' data-x={dx[0]} data-y={dy[0]} />
           <g className='dots' {...dotStyle}>
-            <circle className='marker x0-marker y0-marker' cx='0' cy='0' r='1' fill='none' stroke='none' strokeWidth='0' data-x={dx[0]} data-y={dy[0]} />
             {data.map((d, i) => {
               return (
                 <circle
@@ -148,8 +147,8 @@ class TimeSeries extends Chart {
                 />
               );
             })}
-            <circle className='marker x1-marker y1-marker' cx={width} cy={height} r='1' fill='none' stroke='none' strokeWidth='0' data-x={dx[1]} data-y={dy[1]} />
           </g>
+          <circle className='marker x1-marker y1-marker' cx={width} cy={height} r='1' fill='none' stroke='none' strokeWidth='0' data-x={dx[1]} data-y={dy[1]} />
         </g>
       </svg>
     );

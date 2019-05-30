@@ -1,9 +1,10 @@
 import React from 'react';
+
+export const ChartBrush = React.createContext(null);
+
 import { brush, brushSelection } from 'd3-brush';
 import { scaleLinear } from 'd3-scale';
 import { select, selectAll } from 'd3-selection';
-
-export const ChartBrush = React.createContext(null);
 
 export const ZoomContext = React.createContext(null);
 
@@ -44,10 +45,13 @@ export class useBrush {
     }
   }
 
-  update(node, name, selector) {
+  update(node, name, selector, x, y, getData = null) {
     this.node = node;
     this.name = name;
     this.selector = selector;
+    this.x = x;
+    this.y = y;
+    if (getData) this.getData = getData;
   }
 
 }
@@ -81,7 +85,7 @@ export class Brush {
     context.parentNode = this.node;
     context.start = context.node.querySelector('.marker.x0-marker');
     context.end = context.node.querySelector('.marker.x1-marker');
-    context.getData = this.getDatum;
+    context.getData = context.getData? context.getData : this.getDatum;
 
     this.initDataScale(context);
 
@@ -93,6 +97,7 @@ export class Brush {
       let callback = context.callback;
       this.brush.on(`${callback[0]}.${name}_${callback[2]? callback[2] : 'default'}`, callback[1]);
     }
+
     if (context.callbackName) {
       switch (context.callbackName) {
         case 'log':
@@ -124,7 +129,7 @@ export class Brush {
       [x0, x1] = [ thisArg.parentScale.x(x0), thisArg.parentScale.x(x1) ];
       let sx = dataScale.x;
       return (d) => {
-        const x = sx(+d.getAttribute('cx'));
+        const x = sx(+d.getAttribute(context.x));
         return x >= x0 && x <= x1;
       };
     };
@@ -139,7 +144,7 @@ export class Brush {
       [y0, y1] = [ thisArg.parentScale.y(y0), thisArg.parentScale.y(y1) ];
       let sy = dataScale.y;
       return (d) => {
-        const y = sy(+d.getAttribute('cy'));
+        const y = sy(+d.getAttribute(context.y));
         return y >= y0 && y <= y1;
       };
     };
@@ -170,11 +175,11 @@ export class Brush {
 
   getDataset(context) {
     const { getData } = context;
-    return this.getNodes(context).map(getData);
+    return this.getNodes(context).map(getData).flat();
   }
 
   logger(context) {
-    return () => this.getDataset(context).map(({x, y}) => console.log(`x: ${x}, y: ${y}`));
+    return () => this.getDataset(context).map((d) => console.log(d));
   }
 
   colorer(context) {
@@ -184,7 +189,7 @@ export class Brush {
 
   dataScaleX(context) {
     const { start, end } = context;
-    let [x0, x1] = [ (+start.getAttribute('cx')), (+end.getAttribute('cx')) ];
+    let [x0, x1] = [ (+start.getAttribute(context.x)), (+end.getAttribute(context.x)) ];
 
     let { left } = start.getBoundingClientRect();
     let { right } = end.getBoundingClientRect();
@@ -194,7 +199,7 @@ export class Brush {
 
   dataScaleY(context) {
     const { start, end } = context;
-    let [y0, y1] = [ (+start.getAttribute('cy')), (+end.getAttribute('cy')) ];
+    let [y0, y1] = [ (+start.getAttribute(context.y)), (+end.getAttribute(context.y)) ];
 
     let { top } = start.getBoundingClientRect();
     let { bottom } = end.getBoundingClientRect();

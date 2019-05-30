@@ -47,6 +47,14 @@ class Container extends Component {
   }
 
   componentDidMount() {
+
+    if (!this.brush) this.brush =  new Brush(this.groupRef.current);
+
+    this.setState({brush: this.brush});
+
+    let z = zoom().on('zoom', this.zoomed(this.onZoom));
+    select(this.groupRef.current).call(z);
+
     dsv(' ', '/public/timeseries.csv', d => d).then(data => {
       const timeseries = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: +data[i].x}));
       const timeseries2 = mapToDate(data.slice(0, 100), (d) => d.t).map((d, i) => ({t: d, x: +data[i].y}));
@@ -55,12 +63,7 @@ class Container extends Component {
       const scatterplot2 = data.slice(0, 100).map((d, i) => ({x: +d.x, y: +d.y, c: +d.z}));
       const scatterplot3 = data.slice(0, 100).map((d, i) => ({x: +d.z, y: +d.x, c: +d.y}));
 
-      if (!this.brush) this.brush =  new Brush(this.groupRef.current);
-
-      let z = zoom().on('zoom', this.zoomed(this.onZoom));
-      select(this.groupRef.current).call(z);
-
-      this.setState({brush: this.brush, cdata: timeseries, cdata2: timeseries2, cdata3: timeseries3, sdata: scatterplot, sdata2: scatterplot2, sdata3: scatterplot3, loaded: true});
+      this.setState({cdata: timeseries, cdata2: timeseries2, cdata3: timeseries3, sdata: scatterplot, sdata2: scatterplot2, sdata3: scatterplot3, loaded: true});
     })
   }
 
@@ -82,105 +85,118 @@ class Container extends Component {
     const hyAxis = <Axis axis='y' color='palevioletred' offset='2' tickFormat={t => `${t*(-1)}k`} />;
     let tsBrush = new useBrush('color', '#dd0000');
     let spBrush = new useBrush('color', '#00dd00');
+    let histBrush = new useBrush('color', 'indigo');
     return (
-      <figure className='chart-container' id='chart1' style={style}>
+      <figure className="chart-container" id="chart1" style={style}>
         <ZoomContext.Provider value={this.state.zoom}>
-        <ChartBrush.Provider value={this.state.brush}>
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          xmlnsXlink='http://www.w3.org/1999/xlink'
-          viewBox={`-${margin.left} -${margin.top} ${width +
-            margin.left +
-            margin.right} ${height + margin.top + margin.bottom}`}
-          preserveAspectRatio='xMinYMax meet'
-          style={{ maxHeight: '75vh', fontSize: '0' }}
-        >
-          <g className='chart-groups' ref={this.groupRef}>
-            {this.state.loaded ? (
-              <TimeSeriesCollection
-                width={600}
-                height={600}
-              >
-                <TimeSeries
-                  data={this.state.cdata}
-                  name='blue'
-                  brush={tsBrush}
-                  selectX={d => d.t}
-                  selectY={d => d.x}
-                  strokeWidth={4}
-                  strokeDasharray={5}
-                  stroke='#29b6f6'
-                  dots={{ fill: '#5b6bc0', r: 3 }}
-                />
-                <TimeSeries
-                  data={this.state.cdata2}
-                  selectX={d => d.t}
-                  selectY={d => d.x}
-                  strokeWidth={4}
-                  strokeDasharray={5}
-                  stroke='#ff7c43'
-                  dots={{ fill: '#ffa600', r: 3 }}
-                />
-                <TimeSeries
-                  data={this.state.cdata3}
-                  selectX={d => d.t}
-                  selectY={d => d.x}
-                  strokeWidth={4}
-                  strokeDasharray={5}
-                  stroke='#d45087'
-                  dots={{ fill: '#f95d6a', r: 3 }}
-                />
-              </TimeSeriesCollection>
-            ) : null}
+          <ChartBrush.Provider value={this.state.brush}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              xmlnsXlink="http://www.w3.org/1999/xlink"
+              viewBox={`-${margin.left} -${margin.top} ${width +
+                margin.left +
+                margin.right} ${height + margin.top + margin.bottom}`}
+              preserveAspectRatio="xMinYMax meet"
+              style={{ maxHeight: '75vh', fontSize: '0' }}
+            >
+              <g className="chart-groups" ref={this.groupRef}>
+                {this.state.loaded ? (
+                  <TimeSeriesCollection width={600} height={600}>
+                    <TimeSeries
+                      data={this.state.cdata}
+                      name="blue"
+                      brush={tsBrush}
+                      selectX={d => d.t}
+                      selectY={d => d.x}
+                      strokeWidth={4}
+                      strokeDasharray={5}
+                      stroke="#29b6f6"
+                      dots={{ fill: '#5b6bc0', r: 3 }}
+                    />
+                    <TimeSeries
+                      data={this.state.cdata2}
+                      selectX={d => d.t}
+                      selectY={d => d.x}
+                      strokeWidth={4}
+                      strokeDasharray={5}
+                      stroke="#ff7c43"
+                      dots={{ fill: '#ffa600', r: 3 }}
+                    />
+                    <TimeSeries
+                      data={this.state.cdata3}
+                      selectX={d => d.t}
+                      selectY={d => d.x}
+                      strokeWidth={4}
+                      strokeDasharray={5}
+                      stroke="#d45087"
+                      dots={{ fill: '#f95d6a', r: 3 }}
+                    />
+                  </TimeSeriesCollection>
+                ) : null}
 
-            <Histograms width={600} height={600}>
-              <Histogram data={data} label={d => `${d.length}`} nice />
-              <Histogram data={data} nice />
-              <Histogram data={data} nice />
-              <Histogram data={data} nice />
-              <Histogram data={data} nice />
-            </Histograms>
+                {this.state.loaded ? (
+                  <Histograms width={600} height={600}>
+                    <Histogram
+                      data={data}
+                      nice
+                      label={d => `${d.length}`}
+                      brush={histBrush}
+                    />
+                    <Histogram
+                      data={data}
+                      nice
+                      label={(d, i) => `${d.reduce((n, acc) => acc + n)}`}
+                    />
+                    <Histogram
+                      data={data}
+                      nice
+                      label={(_d, i) => `${i + 1}`}
+                    />
+                    <Histogram data={data} nice />
+                    <Histogram data={data} nice />
+                  </Histograms>
+                ) : null}
 
-            {this.state.loaded ? (
-              <Scatterplots
-                margin={{ top: 20, right: 42, bottom: 20, left: 30 }}
-                width={600}
-                height={600}
-                axisBottom={hxAxis}
-                axisLeft={hyAxis}
-              >
-                <Scatterplot
-                  data={this.state.sdata}
-                  label={d => `${d.label}`}
-                  name='green'
-                  brush={spBrush}
-                  selectX={d => d.x}
-                  selectY={d => d.y}
-                  selectColor={d => d.c}
-                  fill='#ffa600'
-                  scheme='Dark2'
-                />
-                <Scatterplot
-                  data={this.state.sdata2}
-                  selectX={d => d.x}
-                  selectY={d => d.y}
-                  selectColor={d => d.c}
-                  fill='#ff4500'
-                  scheme='Set1'
-                />
-                <Scatterplot
-                  data={this.state.sdata3}
-                  selectX={d => d.x}
-                  selectY={d => d.y}
-                  selectColor={d => d.c}
-                  fill='#palevioletred'
-                  scheme='Accent'
-                />
-              </Scatterplots>
-            ) : null}
-          </g>
-        </svg>
-        </ChartBrush.Provider>
+                {this.state.loaded ? (
+                  <Scatterplots
+                    margin={{ top: 20, right: 42, bottom: 20, left: 30 }}
+                    width={600}
+                    height={600}
+                    axisBottom={hxAxis}
+                    axisLeft={hyAxis}
+                  >
+                    <Scatterplot
+                      data={this.state.sdata}
+                      label={d => `${d.label}`}
+                      name="green"
+                      brush={spBrush}
+                      selectX={d => d.x}
+                      selectY={d => d.y}
+                      selectColor={d => d.c}
+                      fill="#ffa600"
+                      scheme="Dark2"
+                    />
+                    <Scatterplot
+                      data={this.state.sdata2}
+                      selectX={d => d.x}
+                      selectY={d => d.y}
+                      selectColor={d => d.c}
+                      fill="#ff4500"
+                      scheme="Set1"
+                    />
+                    <Scatterplot
+                      data={this.state.sdata3}
+                      selectX={d => d.x}
+                      selectY={d => d.y}
+                      selectColor={d => d.c}
+                      fill="#palevioletred"
+                      scheme="Accent"
+                    />
+                  </Scatterplots>
+                ) : null}
+              </g>
+            </svg>
+          </ChartBrush.Provider>
         </ZoomContext.Provider>
       </figure>
     );

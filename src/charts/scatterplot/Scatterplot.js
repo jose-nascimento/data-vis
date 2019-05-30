@@ -42,7 +42,7 @@ class Scatterplot extends Chart {
     if (chartBrush && this.state && this.state.loaded && this.props.brush) {
 
       let ctx = this.props.brush;
-      ctx.update(this.thisRef.current, name? name : 'scatterplot', `${name? ('.name-' + name + ' ') : ''}.points .point`);
+      ctx.update(this.thisRef.current, name? name : 'scatterplot', `${name? ('.name-' + name + ' ') : ''}.points .point`, 'cx', 'cy');
   
       chartBrush.bindBrush(ctx);
       this.setState({brush: ctx});
@@ -90,6 +90,8 @@ class Scatterplot extends Chart {
       colorScale: cs,
       label,
       textStyle,
+      brush,
+      scale,
       ...props
     } = this.props;
     const datapoints = this.state.datapoints;
@@ -127,7 +129,7 @@ class Scatterplot extends Chart {
             return (
               <g key={i}>
               {label && 
-                <text y={datapoints[i].y - 2} x={datapoints[i].y} style={textStyle}>
+                <text y={datapoints[i].y - 5} x={datapoints[i].x - 5} style={textStyle}>
                   {label(d)}
                 </text>
               }

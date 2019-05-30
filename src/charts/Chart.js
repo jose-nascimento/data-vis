@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { addScale } from './helpers';
+import { black } from 'ansi-colors';
 
 export function withAxes(WrappedChart) {
   return class extends Component {
@@ -69,8 +70,9 @@ class Chart extends Component {
     strokeLinecap: 'butt',
     strokeWidth: '0',
     textStyle: {
-      fontSize: 10,
+      fontSize: 9,
       color: 'black',
+      fill: 'black',
     },
   };
 
