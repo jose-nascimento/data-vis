@@ -20,7 +20,7 @@ const data =  [75, 104, 369, 300, 92, 64, 265, 35, 287, 69, 52, 23, 287, 87, 114
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
     by the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+    any later version.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
