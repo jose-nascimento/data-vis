@@ -3,7 +3,22 @@ import Chart, { withAxes } from '../Chart';
 import { max, min } from 'd3-array';
 import { scaleLinear } from 'd3-scale';
 import { load } from './helpers';
-import { ChartBrush, useBrush } from '../../components/chart/brush';
+import { ChartBrush } from '../../components/chart/brush';
+
+/*  Copyright (C) 2019 Jose Licio
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 class Scatterplots extends Chart {
 
@@ -50,28 +65,10 @@ class Scatterplots extends Chart {
     let scaleY = scaleLinear().range([height, 0]).domain(yDomain);
 
     this.state = {scale: {x: scaleX, y: scaleY}, plots: plotData}
-    
-
-  }
-
-  componentDidMount() {
-    // const chartBrush = this.context;
-
-    // let ctx = new useBrush(this.thisRef.current, 'scatterplots', '.points .point', 'color', '#00dd00');
-
-    // chartBrush.bindBrush(ctx);
   }
 
   render() {
     const { width, height, margin, axisRight, axisBottom, axisLeft, children, ...props } = this.props;
-
-    // const x = 0;
-    // const y = margin.top + margin.bottom;
-    
-    // const transforms = { 
-    //   transform: `translate(${x}px, ${y}px)`
-    // };
-    
     
     return (
       <svg

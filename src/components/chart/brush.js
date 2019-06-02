@@ -1,35 +1,25 @@
 import React from 'react';
-
-export const ChartBrush = React.createContext(null);
-
 import { brush, brushSelection } from 'd3-brush';
 import { scaleLinear } from 'd3-scale';
-import { select, selectAll } from 'd3-selection';
+import { select } from 'd3-selection';
 
+/*  Copyright (C) 2019 Jose Licio
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+
+export const ChartBrush = React.createContext(null);
 export const ZoomContext = React.createContext(null);
-
-export function onBrush() {
-  console.log('brushed', this);
-
-  const selection = brushSelection(this);
-  console.log(selection);
-}
-
-export function applyBrush(thisArg) {
-  return onBrush.bind(thisArg);
-}
-
-export const BrushContext = React.createContext(null);
-
-export function brushed(node) {
-  const currentNode = select(node);
-  const currentBrush = brush();
-  return function addBrush(event, name, callback) {
-    let typename = event + name? `.${name}` : '';
-    currentNode.call(currentBrush.on('end', callback));
-  }
-}
-
 export class useBrush {
 
   constructor(callback = 'set', color = 'black') {
